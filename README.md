@@ -19,3 +19,7 @@ For .gitconfig this line will allow you to mix personal settings (email, name) w
   path = /path/to/github/dotfile/sg.gitconfig
 ```
 
+To Do
+-----
+- [ ] Convert vim solarized and pathogen to git repos (using submodules?)
+- [ ] setup script
