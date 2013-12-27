@@ -21,5 +21,5 @@ For .gitconfig this line will allow you to mix personal settings (email, name) w
 
 To Do
 -----
-- [ ] Convert vim solarized and pathogen to git repos (using submodules?)
-- [ ] setup script
+- Convert vim solarized and pathogen to git repos (using submodules?)
+- setup script
