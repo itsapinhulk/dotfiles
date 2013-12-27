@@ -16,7 +16,7 @@ For .gitconfig this line will allow you to mix personal settings (email, name) w
 
 ```
 [include] 
-  path = /path/to/github/dotfile/sg.gitconfig
+  path = /path/to/github/dotfiles/.gitconfig
 ```
 
 To Do
