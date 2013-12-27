@@ -1,5 +1,5 @@
 [alias]
-    tree = log --graph --decorate --pretty=oneline --abbrev-commit
+    tree = log --graph --decorate --pretty=oneline --abbrev-commit --all
 [core]
     editor = vim
 [color]
