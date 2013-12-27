@@ -12,3 +12,6 @@ EDITOR=vim
 GIT_EDITOR=vim
 
 PS1='\e[31m[\u@\h] \w\e[33m$(__git_ps1)\e[31m \$ \e[39m'
+
+function settitle() { echo -ne "\e]2;$@\a\e]1;$@\a"; }
+#settitle "TESTSTRING"
