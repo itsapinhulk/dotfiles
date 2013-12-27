@@ -4,3 +4,6 @@
     editor = vim
 [color]
     ui = auto
+[branch "master"]
+  mergeoptions = --no-commit --no-ff
+
