@@ -1,9 +1,9 @@
 [alias]
     tree = log --graph --decorate --pretty=oneline --abbrev-commit --all
+    combine = merge --no-ff
 [core]
     editor = vim
 [color]
     ui = auto
-[branch "develop"]
-  mergeoptions = --no-ff
+
 
