@@ -5,7 +5,7 @@ Git repo of personal dot/setting files
 
 Affects
 -------
-Bash, vim, git, terminal (tested under Ubuntu)
+Bash, vim, git, terminator (tested under Crunchbang)
 
 Installation
 ------------
@@ -21,5 +21,4 @@ For .gitconfig this line will allow you to mix personal settings (email, name) w
 
 To Do
 -----
-- Convert vim solarized and pathogen, dir colors and .git-* to git repos (using submodules?)
-- setup script
+- improve setup script
