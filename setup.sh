@@ -11,6 +11,11 @@ mkdir -p ~/.vim
 ln -s ~/workspace/github/dotfiles/vim/autoload ~/.vim/
 ln -s ~/workspace/github/dotfiles/vim/bundle ~/.vim/
 
+mkdir -p ~/.fonts
+ln -s ~/workspace/github/dotfiles/fonts/PowerlineSymbols.otf ~/.fonts/
+sudo fc-cache -vf ~/.fonts
+mkdir -p ~/.config/fontconfig/conf.d
+ln -s ~/workspace/github/dotfiles/fonts/10-powerline-symbols.conf ~/.config/fontconfig/conf.d/
 
 #something about git config
 

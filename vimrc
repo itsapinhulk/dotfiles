@@ -17,6 +17,10 @@ set softtabstop=2
 set shiftwidth=2
 set expandtab
 set hlsearch
+set laststatus=2
+set guifont=Liberation\ Mono\ for\ Powerline\ 10
+
+let g:airline_powerline_fonts = 1
 
 xnoremap p pgvy
 
