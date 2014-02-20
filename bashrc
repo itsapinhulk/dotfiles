@@ -1,4 +1,5 @@
 alias ls="ls -F --color=auto"
+alias aptgetupdate="sudo apt-get update && sudo apt-get upgrade"
 export GREP_OPTIONS='--color=auto' 
 
 export TERM=xterm-256color
