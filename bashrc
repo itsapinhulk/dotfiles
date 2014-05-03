@@ -25,3 +25,6 @@ function sett() { tempstr=$(pwd); settitle `basename "$tempstr"`:`hostname`;}
 #sett
 
 #settitle "TESTSTRING"
+
+bind '"\e[A": history-search-backward'
+bind '"\e[B": history-search-forward'
