@@ -21,4 +21,4 @@ For .gitconfig this line will allow you to mix personal settings (email, name) w
 
 To Do
 -----
-- [ ] improve setup script
+- improve setup script
