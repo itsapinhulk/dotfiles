@@ -1,6 +1,7 @@
 alias ls="ls -F --color=auto"
 alias ll="ls -altr"
 alias aptgetupdate="sudo apt-get update && sudo apt-get upgrade"
+alias pipupdate="sudo pip-review -v -a"
 export GREP_OPTIONS='--color=auto' 
 
 export TERM=xterm-256color
