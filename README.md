@@ -13,6 +13,6 @@ run setup.py - It will back any existing files into ~/.backup/
 
 To Do
 -----
-- Include iPython settings
-- Include gnome terminal settings
-- Include Xfce settings
+* [ ] Include iPython settings
+* [ ]Include gnome terminal settings
+* [ ] Include Xfce settings
