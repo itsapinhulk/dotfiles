@@ -19,6 +19,10 @@ set expandtab
 set hlsearch
 set laststatus=2
 set guifont=Liberation\ Mono\ for\ Powerline\ 10
+set foldmethod=indent
+set foldnestmax=2
+nnoremap <space> za
+vnoremap <space> z
 
 let g:airline_powerline_fonts = 1
 
