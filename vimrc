@@ -22,7 +22,7 @@ set guifont=Liberation\ Mono\ for\ Powerline\ 10
 set foldmethod=indent
 set foldnestmax=2
 nnoremap <space> za
-vnoremap <space> z
+vnoremap <space> zf
 
 let g:airline_powerline_fonts = 1
 
