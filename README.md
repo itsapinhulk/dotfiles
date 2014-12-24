@@ -9,7 +9,7 @@ bash, vim, git, fonts
 
 Installation
 ------------
-run setup.py - It will back any existing files into ~/.backup/
+run setup.py - It will backup any existing files into ~/.backup/
 
 To Do
 -----
