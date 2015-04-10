@@ -34,3 +34,4 @@ xnoremap p pgvy
 :map <F7> :set paste<CR>
 :map <F8> :set nopaste<CR>
 
+:nnoremap <silent> <F5> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR>
