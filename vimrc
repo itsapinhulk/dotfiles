@@ -10,6 +10,7 @@ colorscheme solarized
 set mouse=a
 set number
 set smartindent
+set splitbelow
 set wildmenu
 set wildmode=list:longest
 set tabstop=2

@@ -17,3 +17,5 @@ To Do
 * [ ] Include iPython settings
 * [ ] Include gnome terminal settings
 * [ ] Include Xfce settings
+* [ ] Convert to submodules and part of setup
+* [ ] Improve setup, better backup and update
