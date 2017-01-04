@@ -1,6 +1,6 @@
 alias ls="ls -F --color=auto"
 alias ll="ls -altr"
-alias aptgetupdate="sudo apt-get update && sudo apt-get upgrade"
+alias aptupdate="sudo apt update && sudo apt upgrade -y && sudo apt autoremove"
 alias pipupdate="pip list --outdated | cut -d ' ' -f1 | xargs -n1 sudo -H pip install -U"
 export GREP_OPTIONS='--color=auto'
 

@@ -14,8 +14,10 @@ run setup.py - It will backup any existing files into ~/.backup/
 To Do
 -----
 * [x] Flexible setup file
+* [ ] Improve setup, better backup and update
+* [ ] Split into main and .local files
 * [ ] Include iPython settings
 * [ ] Include gnome terminal settings
 * [ ] Include Xfce settings
 * [ ] Convert to submodules and part of setup
-* [ ] Improve setup, better backup and update
+* [ ] Optional sudo requirement for fonts
