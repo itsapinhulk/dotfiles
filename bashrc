@@ -1,7 +1,7 @@
 alias ls="ls -F --color=auto"
 alias ll="ls -altr"
 alias aptupdate="sudo apt update && sudo apt upgrade -y && sudo apt autoremove"
-alias pipupdate="pip list --outdated | cut -d ' ' -f1 | xargs -n1 sudo -H pip install -U"
+alias pipupdate="pip list --format=legacy --outdated | cut -d ' ' -f1 | xargs -n1 sudo -H pip install -U"
 export GREP_OPTIONS='--color=auto'
 
 export TERM=xterm-256color

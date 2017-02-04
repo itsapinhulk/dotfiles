@@ -36,3 +36,8 @@ xnoremap p pgvy
 :map <F8> :set nopaste<CR>
 
 :nnoremap <silent> <F5> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR>
+
+augroup python
+  autocmd!
+  autocmd Filetype python setlocal tabstop=2 shiftwidth=2 softtabstop=2
+augroup end
