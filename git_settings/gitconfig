@@ -1,12 +1,11 @@
-[alias]
-    utree = log --graph --pretty=format:'%C(yellow)%h%Creset -%C(bold red)%d%Creset %s %Cgreen(%cr) %C(blue)<%an>%Creset' --abbrev-commit --date=short --branches --all -20
-    tree = log --graph --pretty=format:'%C(yellow)%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(blue)<%an>%Creset' --abbrev-commit --date=short --branches --all -20
-    combine = merge --no-ff
 
+[alias]
+    tree = log --graph --pretty=format:'%C(yellow)%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(blue)<%an>%Creset' --abbrev-commit --date=short --branches --all -20
 [core]
     editor = vim
     pager = more
 [color]
     ui = auto
-
-
+[user]
+    email = itsapinhulk@outlook.com
+    name = Pulkit Sinha
