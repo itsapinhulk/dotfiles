@@ -16,16 +16,15 @@ createDirs = [
     '~/.config/fontconfig/conf.d',
   ]
 setupMap = {
-                   'vimrc' : '~/.vimrc',
-                  'bashrc' : '~/.bashrc',
-                'dir_colors' : '~/.dir_colors',
-    'git_settings/git-completion.bash' : '~/.git-completion.bash',
-        'git_settings/git-prompt.sh' : '~/.git-prompt.sh',
-              'vim/autoload' : '~/.vim/autoload',
-                'vim/bundle' : '~/.vim/bundle',
-     'fonts/10-powerline-symbols.conf' : '~/.config/fontconfig/conf.d/10-powerline-symbols.conf',
-        'fonts/PowerlineSymbols.otf' : '~/.fonts/PowerlineSymbols.otf',
-  }
+  'vimrc' : '~/.vimrc',
+  'bashrc' : '~/.bashrc',
+  'dir_colors' : '~/.dir_colors',
+  'git_settings/git-completion.bash' : '~/.git-completion.bash',
+  'git_settings/git-prompt.sh' : '~/.git-prompt.sh',
+  'vim/autoload' : '~/.vim/autoload',
+  'fonts/10-powerline-symbols.conf' : '~/.config/fontconfig/conf.d/10-powerline-symbols.conf',
+  'fonts/PowerlineSymbols.otf' : '~/.fonts/PowerlineSymbols.otf',
+}
 
 def _setupFonts():
   if (0 == os.getuid()):
