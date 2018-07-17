@@ -1,6 +1,6 @@
 alias ls="ls -F --color=auto"
 alias ll="ls -altr"
-alias aptupdate="sudo apt update && sudo apt upgrade -y && sudo apt autoremove"
+alias aptupdate="sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y"
 alias pipupdate="pip3 list --format=freeze --outdated | cut -d '=' -f1 | xargs -n1 sudo -H pip3 install -U"
 alias refreshbashprofile='source ~/.bashrc'
 
