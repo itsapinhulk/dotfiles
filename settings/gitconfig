@@ -1,0 +1,17 @@
+
+[alias]
+    tree = log --graph --pretty=format:'%C(yellow)%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(blue)<%an>%Creset' --abbrev-commit --date=short --branches --all -20
+    twig = log --graph --pretty=format:'%C(yellow)%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(blue)<%an>%Creset' --abbrev-commit --date=short -20
+    subupdate = submodule update --init --recursive --force
+    amend = commit --amend --no-edit
+[core]
+    editor = nvim
+    pager = more
+[push]
+    default = simple
+[color]
+    ui = auto
+[fetch]
+    recurseSubmodules = on-demand
+[submodule]
+    fetchJobs = 0
