@@ -1,0 +1,59 @@
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
+alias ls="ls -F --color=auto"
+alias ll="ls -altr"
+alias refreshbashprofile='source ~/.bashrc'
+ 
+umask u=rwx,g=rx,o=
+
+export TERM=xterm-256color
+
+# don't put duplicate lines or lines starting with space in the history.
+# See bash(1) for more options
+HISTCONTROL=ignoreboth
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+HISTSIZE=1000
+HISTFILESIZE=2000
+
+# append to the history file, don't overwrite it
+shopt -s histappend
+
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# Use dotfiles directory
+_DOTFILES_DIR=$(cd $(dirname $(realpath ${BASH_SOURCE[0]})) && cd .. && pwd)
+eval `dircolors ${_DOTFILES_DIR}/ext/dircolors-solarized/dircolors.256dark`
+
+# Setup git related helpers
+source "${_DOTFILES_DIR}/ext/git/contrib/completion/git-completion.bash"
+source "${_DOTFILES_DIR}/ext/git/contrib/completion/git-prompt.sh"
+GIT_PS1_SHOWDIRTYSTATE=1
+GIT_PS1_SHOWUNTRACKEDFILES=1
+GIT_PS1_SHOWUPSTREAM="verbose"
+GIT_PS1_SHOWCOLORSHINT=1
+
+EDITOR=nvim
+
+# Set colorful prompt, which includes git information
+_RED='\[\033[1;31m\]'
+_GREEN='\[\033[1;32m\]'
+_ORANGE='\[\033[1;33m\]'
+_BLUE='\[\033[1;34m\]'
+_RESET='\[\033[00m\]' # No Color
+_PS1_PRE="${_RED}[\u@\h] ${_BLUE}\w${_ORANGE}"
+_PS1_POST="\n${_GREEN}\\\$ ${_RESET}"
+PROMPT_COMMAND='__git_ps1 "${_PS1_PRE}" "${_PS1_POST}"'
+
+bind '"\e[A": history-search-backward'
+bind '"\e[B": history-search-forward'
+
+if [[ -f ~/.nix-profile ]]; then
+    source ~/.nix-profile/etc/profile.d/nix.sh
+fi

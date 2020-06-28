@@ -1,0 +1,6 @@
+[submodule "ext/git"]
+	path = ext/git
+	url = https://github.com/git/git.git
+[submodule "ext/dircolors-solarized"]
+	path = ext/dircolors-solarized
+	url = https://github.com/seebi/dircolors-solarized.git
