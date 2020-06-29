@@ -4,3 +4,6 @@
 [submodule "ext/dircolors-solarized"]
 	path = ext/dircolors-solarized
 	url = https://github.com/seebi/dircolors-solarized.git
+[submodule "ext/source-code-pro"]
+	path = ext/source-code-pro
+	url = https://github.com/adobe-fonts/source-code-pro.git

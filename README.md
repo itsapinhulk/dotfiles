@@ -9,4 +9,8 @@ Add to ~/.gitconfig -
 [include]
     path = /path/to/dotfiles/settings/gitconfig
 
+Fonts -
+Copy : ext/source-code-pro/OTF/*.otf ~/.fonts
+Run : fc-cache -f -v
+
 ```
