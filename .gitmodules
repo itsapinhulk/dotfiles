@@ -7,3 +7,6 @@
 [submodule "ext/source-code-pro"]
 	path = ext/source-code-pro
 	url = https://github.com/adobe-fonts/source-code-pro.git
+[submodule "ext/nixpkgs"]
+	path = ext/nixpkgs
+	url = https://github.com/NixOS/nixpkgs.git
