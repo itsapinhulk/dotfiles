@@ -54,6 +54,7 @@ PROMPT_COMMAND='__git_ps1 "${_PS1_PRE}" "${_PS1_POST}"'
 bind '"\e[A": history-search-backward'
 bind '"\e[B": history-search-forward'
 
-if [[ -f ~/.nix-profile ]]; then
-    source ~/.nix-profile/etc/profile.d/nix.sh
+if [[ -d "$HOME/.nix-profile" ]]; then
+    source $HOME/.nix-profile/etc/profile.d/nix.sh
+    export XDG_DATA_DIRS="$HOME/.nix-profile/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
 fi
