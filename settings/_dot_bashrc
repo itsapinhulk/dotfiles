@@ -31,15 +31,19 @@ shopt -s checkwinsize
 _DOTFILES_DIR=$(cd $(dirname $(realpath ${BASH_SOURCE[0]})) && cd .. && pwd)
 eval `dircolors ${_DOTFILES_DIR}/ext/dircolors-solarized/dircolors.256dark`
 
-# Setup git related helpers
+# All bash completions
+source "${_DOTFILES_DIR}/ext/tmux-bash-completion/completions/tmux"
 source "${_DOTFILES_DIR}/ext/git/contrib/completion/git-completion.bash"
 source "${_DOTFILES_DIR}/ext/git/contrib/completion/git-prompt.sh"
+
+# Setup git related helpers
 GIT_PS1_SHOWDIRTYSTATE=1
 GIT_PS1_SHOWUNTRACKEDFILES=1
 GIT_PS1_SHOWUPSTREAM="verbose"
 GIT_PS1_SHOWCOLORSHINT=1
 
 EDITOR=nvim
+
 
 # Set colorful prompt, which includes git information
 _RED='\[\033[1;31m\]'

@@ -10,3 +10,6 @@
 [submodule "ext/nixpkgs"]
 	path = ext/nixpkgs
 	url = https://github.com/NixOS/nixpkgs.git
+[submodule "ext/tmux-bash-completion"]
+	path = ext/tmux-bash-completion
+	url = https://github.com/imomaliev/tmux-bash-completion.git
