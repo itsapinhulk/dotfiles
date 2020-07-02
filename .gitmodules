@@ -16,3 +16,6 @@
 [submodule "ext/nix-bash-completion"]
 	path = ext/nix-bash-completion
 	url = https://github.com/hedning/nix-bash-completions
+[submodule "ext/tmux-conf"]
+	path = ext/tmux-conf
+	url = https://github.com/gpakosz/.tmux.git

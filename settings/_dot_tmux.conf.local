@@ -1,0 +1,53 @@
+# new window, pane retains current path
+tmux_conf_new_window_retain_current_path=true
+tmux_conf_new_pane_retain_current_path=true
+
+# prompt for session name
+tmux_conf_new_session_prompt=true
+
+# Attempt to reconnect SSH sessions
+tmux_conf_new_pane_reconnect_ssh=true
+
+# RGB 24 bit color support
+tmux_conf_theme_24b_colour=true
+
+# Powerline symbols
+tmux_conf_theme_left_separator_main='\uE0B0'
+tmux_conf_theme_left_separator_sub='\uE0B1'
+tmux_conf_theme_right_separator_main='\uE0B2'
+tmux_conf_theme_right_separator_sub='\uE0B3'
+
+# copy to OS clipboard
+tmux_conf_copy_to_os_clipboard=true
+
+tmux_conf_theme_terminal_title='#h ● #S ● #I #W'
+
+tmux_conf_theme_window_status_current_format='#I #W #F'
+
+tmux_conf_theme_window_status_activity_fg='#ff0000'
+tmux_conf_theme_window_status_activity_attr='blink,bold'
+
+tmux_conf_theme_status_left=' #S | ↑#{?uptime_y, #{uptime_y}y,}#{?uptime_d, #{uptime_d}d,}#{?uptime_h, #{uptime_h}h,}#{?uptime_m, #{uptime_m}m,} '
+tmux_conf_theme_status_right='#{prefix}#{pairing}#{synchronized} #{?battery_status, #{battery_status},}#{?battery_bar, #{battery_bar},}#{?battery_percentage, #{battery_percentage},} , %R , %d %b | #{username}#{root} | #{?hostname_ssh, #{hostname_ssh}, #{hostname}} '
+
+set -g history-limit 10000
+
+set -g mouse on
+
+set -g terminal-overrides ",*256col*:Tc"
+
+# Don't capture keys after first one
+set -g repeat-time 0
+
+# Different pane creation keys
+unbind %
+unbind '"'
+bind | split-window -h
+bind _ split-window -v
+
+set -g allow-rename off
+set -g visual-activity on
+set -g visual-bell on
+set -g visual-silence off
+set -g bell-action none
+

@@ -51,7 +51,6 @@ GIT_PS1_SHOWCOLORSHINT=1
 
 EDITOR=nvim
 
-
 # Set colorful prompt, which includes git information
 _RED='\[\033[1;31m\]'
 _GREEN='\[\033[1;32m\]'
