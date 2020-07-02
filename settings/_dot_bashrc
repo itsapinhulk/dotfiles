@@ -6,8 +6,11 @@ esac
 
 alias ls="ls -F --color=auto"
 alias ll="ls -altr"
+alias lh="ls -altrh"
+alias which="alias | which --tty-only --read-alias --show-dot --show-tilde"
+
 alias refreshbashprofile='source ~/.bashrc'
- 
+
 umask u=rwx,g=rx,o=
 
 export TERM=xterm-256color
@@ -61,6 +64,7 @@ _PS1_PRE="${_RED}[\u@\h] ${_BLUE}\w${_ORANGE}"
 _PS1_POST="\n${_GREEN}\\\$ ${_RESET}"
 PROMPT_COMMAND='__git_ps1 "${_PS1_PRE}" "${_PS1_POST}"'
 
+# Use current input when searching with arrow keys
 bind '"\e[A": history-search-backward'
 bind '"\e[B": history-search-forward'
 

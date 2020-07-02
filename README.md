@@ -2,7 +2,6 @@
 
 Repository of personal dot/setting files and Nix based environment setup
 
-
 ## Manual Setup
 
 ### Bash, NeoVim, Tmux
@@ -19,6 +18,9 @@ settings/_dot_tmux.conf.local   -> ~/.tmux.conf.local
 
 ### Git
 ```
+Setup soft link -
+settings/_dot_gitignore_global  -> ~/.gitignore_global
+
 Add to ~/.gitconfig -
 [include]
     path = /path/to/dotfiles/settings/gitconfig
