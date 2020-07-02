@@ -1,21 +1,23 @@
 [submodule "ext/git"]
-	path = ext/git
-	url = https://github.com/git/git.git
+    path = ext/git
+    url = https://github.com/git/git.git
+    shallow = true
 [submodule "ext/dircolors-solarized"]
-	path = ext/dircolors-solarized
-	url = https://github.com/seebi/dircolors-solarized.git
+    path = ext/dircolors-solarized
+    url = https://github.com/seebi/dircolors-solarized.git
 [submodule "ext/source-code-pro"]
-	path = ext/source-code-pro
-	url = https://github.com/adobe-fonts/source-code-pro.git
+    path = ext/source-code-pro
+    url = https://github.com/adobe-fonts/source-code-pro.git
 [submodule "ext/nixpkgs"]
-	path = ext/nixpkgs
-	url = https://github.com/NixOS/nixpkgs.git
+    path = ext/nixpkgs
+    url = https://github.com/NixOS/nixpkgs.git
+    shallow = true
 [submodule "ext/tmux-bash-completion"]
-	path = ext/tmux-bash-completion
-	url = https://github.com/imomaliev/tmux-bash-completion.git
+    path = ext/tmux-bash-completion
+    url = https://github.com/imomaliev/tmux-bash-completion.git
 [submodule "ext/nix-bash-completion"]
-	path = ext/nix-bash-completion
-	url = https://github.com/hedning/nix-bash-completions
+    path = ext/nix-bash-completion
+    url = https://github.com/hedning/nix-bash-completions
 [submodule "ext/tmux-conf"]
-	path = ext/tmux-conf
-	url = https://github.com/gpakosz/.tmux.git
+    path = ext/tmux-conf
+    url = https://github.com/gpakosz/.tmux.git
