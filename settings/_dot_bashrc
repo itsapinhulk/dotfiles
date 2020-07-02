@@ -20,6 +20,9 @@ HISTCONTROL=ignoreboth
 HISTSIZE=1000
 HISTFILESIZE=2000
 
+# Extended regex matching
+shopt -s extglob
+
 # append to the history file, don't overwrite it
 shopt -s histappend
 
@@ -32,11 +35,15 @@ _DOTFILES_DIR=$(cd $(dirname $(realpath ${BASH_SOURCE[0]})) && cd .. && pwd)
 eval `dircolors ${_DOTFILES_DIR}/ext/dircolors-solarized/dircolors.256dark`
 
 # All bash completions
-source "${_DOTFILES_DIR}/ext/tmux-bash-completion/completions/tmux"
-source "${_DOTFILES_DIR}/ext/git/contrib/completion/git-completion.bash"
-source "${_DOTFILES_DIR}/ext/git/contrib/completion/git-prompt.sh"
+if [[ -f "/etc/profile.d/bash_completion.sh" ]]; then
+    source "/etc/profile.d/bash_completion.sh"
+    source "${_DOTFILES_DIR}/ext/nix-bash-completion/_nix"
+    source "${_DOTFILES_DIR}/ext/tmux-bash-completion/completions/tmux"
+    source "${_DOTFILES_DIR}/ext/git/contrib/completion/git-completion.bash"
+fi
 
 # Setup git related helpers
+source "${_DOTFILES_DIR}/ext/git/contrib/completion/git-prompt.sh"
 GIT_PS1_SHOWDIRTYSTATE=1
 GIT_PS1_SHOWUNTRACKEDFILES=1
 GIT_PS1_SHOWUPSTREAM="verbose"

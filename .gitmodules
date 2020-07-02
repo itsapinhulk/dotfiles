@@ -13,3 +13,6 @@
 [submodule "ext/tmux-bash-completion"]
 	path = ext/tmux-bash-completion
 	url = https://github.com/imomaliev/tmux-bash-completion.git
+[submodule "ext/nix-bash-completion"]
+	path = ext/nix-bash-completion
+	url = https://github.com/hedning/nix-bash-completions
