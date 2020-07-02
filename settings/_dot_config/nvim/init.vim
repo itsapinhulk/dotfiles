@@ -94,3 +94,6 @@ set undoreload=10000        " number of lines to save for undo
 " Make space shortcut for folding
 nnoremap <space> za
 vnoremap <space> zf
+
+" Better paste behavior
+xnoremap p pgvy
