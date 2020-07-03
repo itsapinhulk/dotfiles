@@ -7,7 +7,10 @@ esac
 alias ls="ls -F --color=auto"
 alias ll="ls -altr"
 alias lh="ls -altrh"
-alias which="alias | which --tty-only --read-alias --show-dot --show-tilde"
+if which --version &> /dev/null; then
+    # only create alias for supported which variants
+    alias which="alias | which --tty-only --read-alias --show-dot --show-tilde"
+fi
 
 alias refreshbashprofile='source ~/.bashrc'
 
