@@ -28,7 +28,7 @@ Add to ~/.gitconfig -
 
 ### Fonts
 ```
-mkir -p ~/.fonts
+mkdir -p ~/.fonts
 cp -r ext/source-code-pro/OTF/*.otf ~/.fonts
 fc-cache -f -v
 ```

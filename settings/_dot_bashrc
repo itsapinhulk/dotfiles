@@ -4,9 +4,15 @@ case $- in
       *) return;;
 esac
 
-alias ls="ls -F --color=auto"
-alias ll="ls -altr"
+if ls --version &> /dev/null; then
+    # Only create alias for supported ls variants
+    alias ls="ls -F --color=auto"
+fi
+
+alias ll="ls -ltr"
+alias la="ls -altr"
 alias lh="ls -altrh"
+
 if which --version &> /dev/null; then
     # only create alias for supported which variants
     alias which="alias | which --tty-only --read-alias --show-dot --show-tilde"
@@ -37,8 +43,16 @@ shopt -s histappend
 shopt -s checkwinsize
 
 # Use dotfiles directory
-_DOTFILES_DIR=$(cd $(dirname $(realpath ${BASH_SOURCE[0]})) && cd .. && pwd)
-eval `dircolors ${_DOTFILES_DIR}/ext/dircolors-solarized/dircolors.256dark`
+
+if command -v realpath &> /dev/null; then
+    _DOTFILES_DIR=$(cd $(dirname $(realpath ${BASH_SOURCE[0]})) && cd .. && pwd)
+else
+    _DOTFILES_DIR=$(cd $(dirname ${BASH_SOURCE[0]}) && cd .. && pwd)
+fi
+
+if command -v dircolors &> /dev/null; then
+    eval `dircolors ${_DOTFILES_DIR}/ext/dircolors-solarized/dircolors.256dark`
+fi
 
 # All bash completions
 if [[ -f "/etc/profile.d/bash_completion.sh" ]]; then
