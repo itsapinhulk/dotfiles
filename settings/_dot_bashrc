@@ -4,6 +4,17 @@ case $- in
       *) return;;
 esac
 
+if [[ ! -z "$IN_NIX_SHELL" ]]; then
+    # When running in nix-shell, unset everything and exit
+    unset PATH
+    unset LD_LIBRARY_PATH
+    unset MANPATH
+    unset LANG
+    unset XDG_DATA_DIRS
+    unset NIX_PATH
+    return
+fi
+
 if ls --version &> /dev/null; then
     # Only create alias for supported ls variants
     alias ls="ls -F --color=auto"
