@@ -10,6 +10,8 @@ Setup soft links -
 
 settings/_dot_config/nvim       -> ~/.config/nvim
 
+settings/_dot_config/nix        -> ~/.config/nix
+
 settings/_dot_bashrc            -> ~/.bashrc
 
 ext/tmux-conf/.tmux.conf        -> ~/.tmux.conf
