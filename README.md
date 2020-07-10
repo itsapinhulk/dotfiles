@@ -8,14 +8,14 @@ Repository of personal dot/setting files and Nix based environment setup
 ```
 Setup soft links -
 
-settings/_dot_config/nvim       -> ~/.config/nvim
+settings/_dot_config/nvim/init.vim      -> ~/.config/nvim/init.vim
 
-settings/_dot_config/nix        -> ~/.config/nix
+settings/_dot_config/nix                -> ~/.config/nix
 
-settings/_dot_bashrc            -> ~/.bashrc
+settings/_dot_bashrc                    -> ~/.bashrc
 
-ext/tmux-conf/.tmux.conf        -> ~/.tmux.conf
-settings/_dot_tmux.conf.local   -> ~/.tmux.conf.local
+ext/tmux-conf/.tmux.conf                -> ~/.tmux.conf
+settings/_dot_tmux.conf.local           -> ~/.tmux.conf.local
 ```
 
 ### Git
