@@ -13,7 +13,6 @@ Plug 'vim-airline/vim-airline'
 Plug 'tmhedberg/SimpylFold'
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'zchee/deoplete-jedi'
-Plug 'LnL7/vim-nix'
 Plug 'vhdirk/vim-cmake'
 call plug#end()
 

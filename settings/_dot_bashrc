@@ -4,18 +4,6 @@ case $- in
       *) return;;
 esac
 
-# When running in nix-shell, unset everything and exit
-if [[ ! -z "$IN_NIX_SHELL" ]]; then
-    unset PATH
-    unset LD_LIBRARY_PATH
-    unset MANPATH
-    unset LANG
-    unset XDG_DATA_DIRS
-    unset XDG_CONFIG_HOME
-    unset NIX_PATH
-    return
-fi
-
 export XDG_CONFIG_HOME=$HOME/.config
 
 if ls --version &> /dev/null; then
@@ -71,13 +59,12 @@ fi
 # All bash completions
 if [[ -f "/etc/profile.d/bash_completion.sh" ]]; then
     source "/etc/profile.d/bash_completion.sh"
-    source "${_DOTFILES_DIR}/ext/nix-bash-completion/_nix"
     source "${_DOTFILES_DIR}/ext/tmux-bash-completion/completions/tmux"
-    source "${_DOTFILES_DIR}/ext/git/contrib/completion/git-completion.bash"
+    source "/usr/share/bash-completion/completions/git"
 fi
 
 # Setup git related helpers
-source "${_DOTFILES_DIR}/ext/git/contrib/completion/git-prompt.sh"
+source "/etc/bash_completion.d/git-prompt"
 GIT_PS1_SHOWDIRTYSTATE=1
 GIT_PS1_SHOWUNTRACKEDFILES=1
 GIT_PS1_SHOWUPSTREAM="verbose"
@@ -99,12 +86,6 @@ PROMPT_COMMAND='__git_ps1 "${_PS1_PRE}" "${_PS1_POST}"'
 # Use current input when searching with arrow keys
 bind '"\e[A": history-search-backward'
 bind '"\e[B": history-search-forward'
-
-if [[ -d "$HOME/.nix-profile" ]]; then
-    source $HOME/.nix-profile/etc/profile.d/nix.sh
-    export XDG_DATA_DIRS="$HOME/.nix-profile/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
-fi
-
 
 # Useful bash functions
 
