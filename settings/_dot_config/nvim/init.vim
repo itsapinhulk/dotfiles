@@ -14,6 +14,7 @@ Plug 'tmhedberg/SimpylFold'
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'zchee/deoplete-jedi'
 Plug 'vhdirk/vim-cmake'
+Plug 'SirVer/ultisnips'
 call plug#end()
 
 set encoding=utf-8
