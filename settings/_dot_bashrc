@@ -75,11 +75,13 @@ EDITOR=nvim
 # Set colorful prompt, which includes git information
 _NAME_RED='\[\033[01;38;5;196m\]'
 _PROMPT_GREEN='\[\033[01;38;5;046m\]'
-_GIT_ORANGE='\[\033[01;38;5;208m\]'
+_VCS_ORANGE='\[\033[01;38;5;208m\]'
 _DIRECTORY_BLUE='\[\033[01;38;5;033m\]'
 _COLOR_RESET='\[\033[00m\]'
 
-_PS1_PRE="${_NAME_RED}[\u@\h] ${_DIRECTORY_BLUE}\w${_GIT_ORANGE}"
+_PS1_USER_HOST="${_NAME_RED}[\u@\h]"
+_PS1_WORKDIR="${_DIRECTORY_BLUE}\w${_VCS_ORANGE}"
+_PS1_PRE="${_PS1_USER_HOST} ${_PS1_WORKDIR}"
 _PS1_POST="\n${_PROMPT_GREEN}\\\$ ${_COLOR_RESET}"
 PROMPT_COMMAND='__git_ps1 "${_PS1_PRE}" "${_PS1_POST}"'
 
@@ -154,4 +156,13 @@ function disk_performance() {
     echo "Running with ${_file_size}, ${_count} times"
     dd if=/dev/zero of="$filename" conv=fdatasync bs=${_file_size} count=${_count};
     rm -f "$filename"
+}
+
+# Single command to start all tmux sessions
+function start_all_tmux() {
+    for _file in $(ls ~/.config/tmuxp/); do
+        local _session_name="${_file%.*}"
+        # Load the session in the background
+        tmuxp load "${_session_name}" -d
+    done
 }
