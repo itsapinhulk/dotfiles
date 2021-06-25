@@ -25,9 +25,9 @@ set ignorecase              " case insensitive matching
 set mouse=a                 " Enable all mouse support
 set hlsearch                " highlight search results
 
-set tabstop=4               " number of columns occupied by a tab character
-set softtabstop=4           " see multiple spaces as tabstops so <BS> does the right thing
-set shiftwidth=4            " width for autoindents
+set tabstop=2               " number of columns occupied by a tab character
+set softtabstop=2           " see multiple spaces as tabstops so <BS> does the right thing
+set shiftwidth=2            " width for autoindents
 set expandtab               " converts tabs to white space
 set clipboard=unnamedplus
 
@@ -42,7 +42,7 @@ set splitright
 set laststatus=2
 set backspace=indent,eol,start  " Fix backspace behavior
 
-set cc=109                  " set a 108 column border for good coding style
+set cc=81                   " set a 80 column border for good coding style
 
 filetype plugin indent on   " allows auto-indenting depending on file type
 syntax on                   " syntax highlighting
