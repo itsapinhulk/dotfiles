@@ -20,10 +20,10 @@ if which --version &> /dev/null; then
     alias which="alias | which --tty-only --read-alias --show-dot --show-tilde"
 fi
 
-if [[ -f ~/.bashrc ]]; then
-  alias refresh_bash_profile='source ~/.bashrc'
-elif [[ -f ~/.bash_profile ]]; then
+if [[ -f ~/.bash_profile ]]; then
   alias refresh_bash_profile='source ~/.bash_profile'
+elif [[ -f ~/.bashrc ]]; then
+  alias refresh_bash_profile='source ~/.bashrc'
 fi
 
 umask u=rwx,g=rx,o=
@@ -129,6 +129,9 @@ function start_all_tmux() {
         tmuxp load "${_session_name}" -d
     done
 }
+
+# Simpler alias to load a tmux session
+alias load_tmux="tmux attach-session -t"
 
 # This following functions were originally taken from -
 # https://raw.githubusercontent.com/JohnMorales/dotfiles/master/colors/24-bit-color.sh
