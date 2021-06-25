@@ -20,7 +20,11 @@ if which --version &> /dev/null; then
     alias which="alias | which --tty-only --read-alias --show-dot --show-tilde"
 fi
 
-alias refreshbashprofile='source ~/.bashrc'
+if [[ -f ~/.bashrc ]]; then
+  alias refresh_bash_profile='source ~/.bashrc'
+elif [[ -f ~/.bash_profile ]]; then
+  alias refresh_bash_profile='source ~/.bash_profile'
+fi
 
 umask u=rwx,g=rx,o=
 
