@@ -67,6 +67,21 @@ if [[ -f "/etc/profile.d/bash_completion.sh" ]]; then
     source "/usr/share/bash-completion/completions/git"
 fi
 
+# Set default editor
+EDITOR=nvim
+
+# Set colorful prompt, which can be used by git prompt
+_NAME_RED='\[\033[01;38;5;196m\]'
+_PROMPT_GREEN='\[\033[01;38;5;046m\]'
+_VCS_ORANGE='\[\033[01;38;5;208m\]'
+_DIRECTORY_BLUE='\[\033[01;38;5;033m\]'
+_COLOR_RESET='\[\033[00m\]'
+
+_PS1_USER_HOST="${_NAME_RED}[\u@\h]"
+_PS1_WORKDIR="${_DIRECTORY_BLUE}\w${_VCS_ORANGE}"
+_PS1_PRE="${_PS1_USER_HOST} ${_PS1_WORKDIR}"
+_PS1_POST="\n${_PROMPT_GREEN}\\\$ ${_COLOR_RESET}"
+  
 # Setup git related helpers
 if [[ -f "/etc/bash_completion.d/git-prompt" ]]; then
   # Conditionally enable git prompt
@@ -77,19 +92,6 @@ if [[ -f "/etc/bash_completion.d/git-prompt" ]]; then
   GIT_PS1_SHOWUPSTREAM="verbose"
   GIT_PS1_SHOWCOLORSHINT=1
 
-  EDITOR=nvim
-
-  # Set colorful prompt, which includes git information
-  _NAME_RED='\[\033[01;38;5;196m\]'
-  _PROMPT_GREEN='\[\033[01;38;5;046m\]'
-  _VCS_ORANGE='\[\033[01;38;5;208m\]'
-  _DIRECTORY_BLUE='\[\033[01;38;5;033m\]'
-  _COLOR_RESET='\[\033[00m\]'
-
-  _PS1_USER_HOST="${_NAME_RED}[\u@\h]"
-  _PS1_WORKDIR="${_DIRECTORY_BLUE}\w${_VCS_ORANGE}"
-  _PS1_PRE="${_PS1_USER_HOST} ${_PS1_WORKDIR}"
-  _PS1_POST="\n${_PROMPT_GREEN}\\\$ ${_COLOR_RESET}"
   PROMPT_COMMAND='__git_ps1 "${_PS1_PRE}" "${_PS1_POST}"'
 fi
 
