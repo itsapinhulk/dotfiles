@@ -17,3 +17,5 @@
     recurseSubmodules = on-demand
 [submodule]
     fetchJobs = 0
+[pull]
+    ff = only
