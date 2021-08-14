@@ -29,7 +29,10 @@ set tabstop=2               " number of columns occupied by a tab character
 set softtabstop=2           " see multiple spaces as tabstops so <BS> does the right thing
 set shiftwidth=2            " width for autoindents
 set expandtab               " converts tabs to white space
-set clipboard=unnamedplus
+
+
+set clipboard=unnamedplus   " Allow interop with system clipboard
+set clipboard+=ideaput      " Allow interop with IntelliJ's clipboard
 
 set autoindent              " indent a new line the same amount as the line just typed
 set number                  " add line numbers
@@ -59,7 +62,7 @@ let g:airline_powerline_fonts = 1
 " Enable completion at startup
 let g:deoplete#enable_at_startup = 1
 
-let g:SimpylFold_docstring_preview = 1      " Show docstring in folds
+let g:SimpylFold_docstring_preview = 1     " Show docstring in folds
 set foldlevel=0                            " Start with some folds open
 
 " Tab navigation and creation (Ctrl-T)
