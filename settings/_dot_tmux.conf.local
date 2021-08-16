@@ -20,7 +20,8 @@ tmux_conf_theme_right_separator_sub='\uE0B3'
 # copy to OS clipboard
 tmux_conf_copy_to_os_clipboard=true
 
-tmux_conf_theme_terminal_title='#h ● #S ● #I #W'
+#tmux_conf_theme_terminal_title='#h ● #S ● #I #W'
+tmux_conf_theme_terminal_title='#S'
 
 tmux_conf_theme_window_status_current_format='#I #W #F'
 
