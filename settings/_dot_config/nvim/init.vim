@@ -31,7 +31,7 @@ set shiftwidth=2            " width for autoindents
 set expandtab               " converts tabs to white space
 
 
-set clipboard=unnamedplus   " Allow interop with system clipboard
+set clipboard+=unnamedplus   " Allow interop with system clipboard
 "set clipboard+=ideaput      " Allow interop with IntelliJ's clipboard
 
 set autoindent              " indent a new line the same amount as the line just typed
