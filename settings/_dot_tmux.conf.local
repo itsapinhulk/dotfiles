@@ -56,3 +56,6 @@ bind / copy-mode \; send-key ?
 
 # Don't capture keys after first one
 set -g repeat-time 0
+
+# Don't enter copy mode on mouse selection
+unbind -n MouseDrag1Pane
