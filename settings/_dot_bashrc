@@ -122,7 +122,7 @@ function disk_performance() {
 }
 
 # Single command to start all tmux sessions
-function start_all_tmux() {
+function tmux_start_server() {
     for _file in $(ls ~/.config/tmuxp/); do
         local _session_name="${_file%.*}"
         # Load the session in the background
@@ -131,7 +131,8 @@ function start_all_tmux() {
 }
 
 # Simpler alias to load a tmux session
-alias load_tmux="tmux attach-session -t"
+alias tmux_load="tmux attach-session -t"
+alias tmux_kill_server="tmux kill-server"
 
 # This following functions were originally taken from -
 # https://raw.githubusercontent.com/JohnMorales/dotfiles/master/colors/24-bit-color.sh
