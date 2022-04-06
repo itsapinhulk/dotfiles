@@ -131,7 +131,7 @@ function tmux_start_server() {
 }
 
 # Simpler alias to load a tmux session
-alias tmux_load="tmux attach-session -t"
+alias tmux_attach="tmux attach-session -t"
 alias tmux_kill_server="tmux kill-server"
 
 # This following functions were originally taken from -
