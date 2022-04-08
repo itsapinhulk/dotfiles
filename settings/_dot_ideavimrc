@@ -1,3 +1,7 @@
 source ~/.vimrc
 
 set clipboard+=ideaput      " Allow interop with IntelliJ's clipboard
+
+" Disable bell sounds
+set visualbell
+set noerrorbells
