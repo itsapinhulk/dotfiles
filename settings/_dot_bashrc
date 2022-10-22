@@ -70,19 +70,30 @@ fi
 # Set default editor
 EDITOR=nvim
 
-# Set colorful prompt, which can be used by git prompt
-_NAME_RED='\[\033[01;38;5;196m\]'
-_PROMPT_GREEN='\[\033[01;38;5;046m\]'
-_VCS_ORANGE='\[\033[01;38;5;208m\]'
-_DIRECTORY_BLUE='\[\033[01;38;5;033m\]'
-_COLOR_RESET='\[\033[00m\]'
+# Set colorful prompt, run `colorgrid` see color values.
+_USERNAME_COLOR='\[\033[01;38;05;196m\]'   # red
+_PROMPT_COLOR='\[\033[01;38;05;046m\]'     # green
+_VCS_COLOR='\[\033[01;38;05;208m\]'        # yellow / orange
+_CONDA_COLOR='\[\033[01;38;05;005m\]'      # magenta
+_TIME_COLOR='\[\033[01;38;05;105m\]'       # purple
+_DIRECTORY_COLOR='\[\033[01;38;05;033m\]'  # blue
+_RESET_COLOR='\[\033[00m\]'
 
-_PS1_USER_HOST="${_NAME_RED}[\u@\h]"
-_PS1_WORKDIR="${_DIRECTORY_BLUE}\w${_VCS_ORANGE}"
-_PS1_PRE="${_PS1_USER_HOST} ${_PS1_WORKDIR}"
-_PS1_POST="\n${_PROMPT_GREEN}\\\$ ${_COLOR_RESET}"
+# Needs to be a function since a lot of values are dynamic
+# The split between pre and post is for the usage with git
+function _ps1_pre() {
+  _PS1_USER_HOST="${_USERNAME_COLOR}[\u@\h]"
+  _PS1_WORKDIR="${_DIRECTORY_COLOR}\w"
+  _PS1_TIME="${_TIME_COLOR}($(date '+%b-%d %H:%M'))"
+  # Unfortuantely conda prompt includes a space at the end, we need to
+  # follow its convention in including its space
+  _PS1_WITH_CONDA="${_PS1_TIME} ${_CONDA_COLOR}${CONDA_PROMPT_MODIFIER}"
+  echo "${_PS1_WITH_CONDA}${_PS1_USER_HOST} ${_PS1_WORKDIR}${_VCS_COLOR}"
+}
+_PS1_POST="\n${_PROMPT_COLOR}\\\$ ${_RESET_COLOR}"
+PROMPT_COMMAND='PS1="$(_ps1_pre) ${_PS1_POST}"'
   
-# Setup git related helpers
+# Setup git related helpers if available
 if [[ -f "/etc/bash_completion.d/git-prompt" ]]; then
   # Conditionally enable git prompt
   source "/etc/bash_completion.d/git-prompt"
@@ -92,7 +103,7 @@ if [[ -f "/etc/bash_completion.d/git-prompt" ]]; then
   GIT_PS1_SHOWUPSTREAM="verbose"
   GIT_PS1_SHOWCOLORSHINT=1
 
-  PROMPT_COMMAND='__git_ps1 "${_PS1_PRE}" "${_PS1_POST}"'
+  PROMPT_COMMAND='__git_ps1 "$(_ps1_pre)" "${_PS1_POST}"'
 fi
 
 # Use current input when searching with arrow keys
