@@ -79,20 +79,25 @@ _TIME_COLOR='\[\033[01;38;05;105m\]'       # purple
 _DIRECTORY_COLOR='\[\033[01;38;05;033m\]'  # blue
 _RESET_COLOR='\[\033[00m\]'
 
+_PS1_USER_HOST="${_USERNAME_COLOR}[\u@\h]"
+_PS1_WORKDIR="${_DIRECTORY_COLOR}\w"
+
+# Needs to be a function since the value is dynamic
+function _ps1_time() {
+  echo "${_TIME_COLOR}($(date '+%b-%d %H:%M'))"
+}
+
 # Needs to be a function since a lot of values are dynamic
 # The split between pre and post is for the usage with git
 function _ps1_pre() {
-  _PS1_USER_HOST="${_USERNAME_COLOR}[\u@\h]"
-  _PS1_WORKDIR="${_DIRECTORY_COLOR}\w"
-  _PS1_TIME="${_TIME_COLOR}($(date '+%b-%d %H:%M'))"
   # Unfortuantely conda prompt includes a space at the end, we need to
   # follow its convention in including its space
-  _PS1_WITH_CONDA="${_PS1_TIME} ${_CONDA_COLOR}${CONDA_PROMPT_MODIFIER}"
+  _PS1_WITH_CONDA="$(_ps1_time) ${_CONDA_COLOR}${CONDA_PROMPT_MODIFIER}"
   echo "${_PS1_WITH_CONDA}${_PS1_USER_HOST} ${_PS1_WORKDIR}${_VCS_COLOR}"
 }
 _PS1_POST="\n${_PROMPT_COLOR}\\\$ ${_RESET_COLOR}"
 PROMPT_COMMAND='PS1="$(_ps1_pre) ${_PS1_POST}"'
-  
+
 # Setup git related helpers if available
 if [[ -f "/etc/bash_completion.d/git-prompt" ]]; then
   # Conditionally enable git prompt
