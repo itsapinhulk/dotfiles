@@ -1,7 +1,21 @@
-source ~/.vimrc
-
 set clipboard+=ideaput      " Allow interop with IntelliJ's clipboard
 
 " Disable bell sounds
 set visualbell
 set noerrorbells
+
+
+" Better paste behavior
+xnoremap p pgvy
+
+
+set nocompatible            " disable compatibility to old-time vi
+set showmatch               " show matching brackets.
+set ignorecase              " case insensitive matching
+set mouse=a                 " Enable all mouse support
+set hlsearch                " highlight search results
+
+set tabstop=2               " number of columns occupied by a tab character
+set softtabstop=2           " see multiple spaces as tabstops so <BS> does the right thing
+set shiftwidth=2            " width for autoindents
+set expandtab               " converts tabs to white space
