@@ -94,3 +94,7 @@ vnoremap <space> zf
 
 " Better paste behavior
 xnoremap p pgvy
+
+" Python executable
+let g:python3_host_prog = '/usr/bin/python3'
+
