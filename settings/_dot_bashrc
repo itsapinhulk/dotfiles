@@ -4,6 +4,11 @@ case $- in
       *) return;;
 esac
 
+_IS_PLATFORM_MACOS=false
+if [[ "$(uname)" == 'Darwin' ]]; then
+    _IS_PLATFORM_MACOS=true
+fi
+
 export XDG_CONFIG_HOME=$HOME/.config
 
 if ls --version &> /dev/null; then
@@ -24,6 +29,10 @@ if [[ -f ~/.bash_profile ]]; then
   alias refresh_bash_profile='source ~/.bash_profile'
 elif [[ -f ~/.bashrc ]]; then
   alias refresh_bash_profile='source ~/.bashrc'
+fi
+
+if [[ ${_IS_PLATFORM_MACOS} ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
 umask u=rwx,g=rx,o=
