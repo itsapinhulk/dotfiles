@@ -107,7 +107,7 @@ function _ps1_time() {
 
 # Needs to be a function since a lot of values are dynamic
 # The split between pre and post is for the usage with git
-functionh_ps1_pre() {
+function _ps1_pre() {
   # Unfortuantely conda prompt includes a space at the end, we need to
   # follow its convention in including its space
   _PS1_WITH_CONDA="$(_ps1_time) ${_CONDA_COLOR}${CONDA_PROMPT_MODIFIER}"
