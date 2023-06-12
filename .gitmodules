@@ -10,3 +10,6 @@
 [submodule "ext/tmux-conf"]
     path = ext/tmux-conf
     url = https://github.com/gpakosz/.tmux.git
+[submodule "ext/git"]
+	path = ext/git
+	url = https://github.com/git/git.git

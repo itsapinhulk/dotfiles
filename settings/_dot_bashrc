@@ -71,9 +71,18 @@ fi
 
 # All bash completions
 if [[ -f "/etc/profile.d/bash_completion.sh" ]]; then
-    source "/etc/profile.d/bash_completion.sh"
-    source "${_DOTFILES_DIR}/ext/tmux-bash-completion/completions/tmux"
-    source "/usr/share/bash-completion/completions/git"
+  source "/etc/profile.d/bash_completion.sh"
+fi
+
+source "${_DOTFILES_DIR}/ext/git/contrib/completion/git-completion.bash"
+source "${_DOTFILES_DIR}/ext/tmux-bash-completion/completions/tmux"
+
+if [[ -f "/usr/local/etc/bash_completion" ]]; then
+  source "/usr/local/etc/bash_completion"
+fi
+
+if [[ -f "${HOMEBREW_PREFIX}/etc/bash_completion.d/git-completion.bash" ]]; then
+  source "${HOMEBREW_PREFIX}/etc/bash_completion.d/git-completion.bash"
 fi
 
 # Set default editor
@@ -98,7 +107,7 @@ function _ps1_time() {
 
 # Needs to be a function since a lot of values are dynamic
 # The split between pre and post is for the usage with git
-function _ps1_pre() {
+functionh_ps1_pre() {
   # Unfortuantely conda prompt includes a space at the end, we need to
   # follow its convention in including its space
   _PS1_WITH_CONDA="$(_ps1_time) ${_CONDA_COLOR}${CONDA_PROMPT_MODIFIER}"
@@ -109,16 +118,17 @@ PROMPT_COMMAND='PS1="$(_ps1_pre) ${_PS1_POST}"'
 
 # Setup git related helpers if available
 if [[ -f "/etc/bash_completion.d/git-prompt" ]]; then
-  # Conditionally enable git prompt
   source "/etc/bash_completion.d/git-prompt"
-
-  GIT_PS1_SHOWDIRTYSTATE=1
-  GIT_PS1_SHOWUNTRACKEDFILES=1
-  GIT_PS1_SHOWUPSTREAM="verbose"
-  GIT_PS1_SHOWCOLORSHINT=1
-
-  PROMPT_COMMAND='__git_ps1 "$(_ps1_pre)" "${_PS1_POST}"'
 fi
+
+source "${_DOTFILES_DIR}/ext/git/contrib/completion/git-prompt.sh"
+
+GIT_PS1_SHOWDIRTYSTATE=1
+GIT_PS1_SHOWUNTRACKEDFILES=1
+GIT_PS1_SHOWUPSTREAM="verbose"
+GIT_PS1_SHOWCOLORSHINT=1
+PROMPT_COMMAND='__git_ps1 "$(_ps1_pre)" "${_PS1_POST}"'
+
 
 # Use current input when searching with arrow keys
 bind '"\e[A": history-search-backward'
