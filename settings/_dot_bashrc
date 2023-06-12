@@ -4,9 +4,9 @@ case $- in
       *) return;;
 esac
 
-_IS_PLATFORM_MACOS=false
+_IS_PLATFORM_MACOS="no"
 if [[ "$(uname)" == 'Darwin' ]]; then
-    _IS_PLATFORM_MACOS=true
+    _IS_PLATFORM_MACOS="yes"
 fi
 
 export XDG_CONFIG_HOME=$HOME/.config
@@ -31,7 +31,7 @@ elif [[ -f ~/.bashrc ]]; then
   alias refresh_bash_profile='source ~/.bashrc'
 fi
 
-if [[ ${_IS_PLATFORM_MACOS} ]]; then
+if [[ ${_IS_PLATFORM_MACOS} == "yes" ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
@@ -84,6 +84,12 @@ fi
 if [[ -f "${HOMEBREW_PREFIX}/etc/bash_completion.d/git-completion.bash" ]]; then
   source "${HOMEBREW_PREFIX}/etc/bash_completion.d/git-completion.bash"
 fi
+
+function source_conda_install() {
+  if [[ -f "${HOME}/Software/miniconda/etc/profile.d/conda.sh" ]]; then
+    source "${HOME}/Software/miniconda/etc/profile.d/conda.sh"
+  fi
+}
 
 # Set default editor
 EDITOR=nvim
