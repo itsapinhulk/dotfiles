@@ -1,0 +1,20 @@
+[submodule "dircolors-solarized"]
+    path = dircolors-solarized
+    url = https://github.com/seebi/dircolors-solarized.git
+    shallow = true
+[submodule "source-code-pro"]
+    path = source-code-pro
+    url = https://github.com/adobe-fonts/source-code-pro.git
+    shallow = true
+[submodule "tmux-bash-completion"]
+    path = tmux-bash-completion
+    url = https://github.com/imomaliev/tmux-bash-completion.git
+    shallow = true
+[submodule "tmux-conf"]
+    path = tmux-conf
+    url = https://github.com/gpakosz/.tmux.git
+    shallow = true
+[submodule "git"]
+    path = git
+    url = https://github.com/git/git.git
+    shallow = true
