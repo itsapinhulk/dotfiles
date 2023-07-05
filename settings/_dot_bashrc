@@ -10,6 +10,7 @@ if [[ "$(uname)" == 'Darwin' ]]; then
 fi
 
 export XDG_CONFIG_HOME=$HOME/.config
+export FIGNORE=$FIGNORE:DS_Store
 
 if ls --version &> /dev/null; then
     # Only create alias for supported ls variants
