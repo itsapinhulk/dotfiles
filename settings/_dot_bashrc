@@ -123,13 +123,17 @@ function _ps1_pre() {
 
 # _OS intentionally includes space to account for cases where it can be empty
 # Grapes by default
-_PS1_OS=$'\xf0\x9f\x8d\x87 '
+PS1_OS_ICON=$'\xf0\x9f\x8d\x87 '
 if [[ ${_IS_PLATFORM_MACOS} == "yes" ]]; then
   # Apple for MacOS
-  _PS1_OS=$'\xf0\x9f\x8d\x8e '
+  PS1_OS_ICON=$'\xf0\x9f\x8d\x8e '
 fi
 
-_PS1_POST="\n${_PS1_OS}${_PROMPT_COLOR}\\\$ ${_RESET_COLOR}"
+function _ps1_os_icon() {
+  echo "${PS1_OS_ICON}"
+}
+
+_PS1_POST="\n${PS1_OS_ICON}${_PROMPT_COLOR}\\\$ ${_RESET_COLOR}"
 
 PROMPT_COMMAND='PS1="$(_ps1_pre) ${_PS1_POST}"'
 
