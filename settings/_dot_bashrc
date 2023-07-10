@@ -121,21 +121,20 @@ function _ps1_pre() {
   echo "${_PS1_WITH_CONDA}${_PS1_USER_HOST} ${_PS1_WORKDIR}${_VCS_COLOR}"
 }
 
-# _OS intentionally includes space to account for cases where it can be empty
 # Grapes by default
-PS1_OS_ICON=$'\xf0\x9f\x8d\x87 '
+PS1_OS_ICON=$'\xf0\x9f\x8d\x87'
 if [[ ${_IS_PLATFORM_MACOS} == "yes" ]]; then
   # Apple for MacOS
-  PS1_OS_ICON=$'\xf0\x9f\x8d\x8e '
+  PS1_OS_ICON=$'\xf0\x9f\x8d\x8e'
 fi
 
 function _ps1_os_icon() {
   echo "${PS1_OS_ICON}"
 }
 
-_PS1_POST="\n${PS1_OS_ICON}${_PROMPT_COLOR}\\\$ ${_RESET_COLOR}"
-
-PROMPT_COMMAND='PS1="$(_ps1_pre) ${_PS1_POST}"'
+function _ps1_post() {
+  echo "\n$(_ps1_os_icon) ${_PROMPT_COLOR}\\\$ ${_RESET_COLOR}"
+}
 
 # Setup git related helpers if available
 if [[ -f "/etc/bash_completion.d/git-prompt" ]]; then
@@ -148,7 +147,7 @@ GIT_PS1_SHOWDIRTYSTATE=1
 GIT_PS1_SHOWUNTRACKEDFILES=1
 GIT_PS1_SHOWUPSTREAM="verbose"
 GIT_PS1_SHOWCOLORSHINT=1
-PROMPT_COMMAND='__git_ps1 "$(_ps1_pre)" "${_PS1_POST}"'
+PROMPT_COMMAND='__git_ps1 "$(_ps1_pre)" "$(_ps1_post)"'
 
 
 # Use current input when searching with arrow keys
