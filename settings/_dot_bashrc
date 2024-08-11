@@ -91,6 +91,7 @@ fi
 function source_conda_install() {
   if [[ -f "${HOME}/Software/miniconda/etc/profile.d/conda.sh" ]]; then
     source "${HOME}/Software/miniconda/etc/profile.d/conda.sh"
+    source "${_DOTFILES_DIR}/ext/conda-bash-completion/conda"
   fi
 }
 
