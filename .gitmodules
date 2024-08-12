@@ -19,6 +19,6 @@
     url = https://github.com/git/git.git
     shallow = true
 [submodule "ext/conda-bash-completion"]
-	path = ext/conda-bash-completion
-	url = https://github.com/tartansandal/conda-bash-completion.git
-  shallow = true
+    path = ext/conda-bash-completion
+    url = https://github.com/tartansandal/conda-bash-completion.git
+    shallow = true
