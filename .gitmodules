@@ -21,3 +21,4 @@
 [submodule "ext/conda-bash-completion"]
 	path = ext/conda-bash-completion
 	url = https://github.com/tartansandal/conda-bash-completion.git
+  shallow = true
