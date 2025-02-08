@@ -9,6 +9,7 @@ Repository of personal dot/setting files and environment setup
 Setup soft links -
 
 settings/_dot_config/nvim/init.vim      -> ~/.config/nvim/init.vim
+settings/_dot_ideavimrc                 -> ~/.ideavimrc
 
 settings/_dot_bashrc                    -> ~/.bashrc
 
@@ -27,7 +28,7 @@ settings/_dot_gitignore_global  -> ~/.gitignore_global
 
 Add to ~/.gitconfig -
 [include]
-    path = /path/to/dotfiles/settings/gitconfig
+    path = /path/to/dotfiles/settings/_dot_gitconfig
 ```
 
 ### Fonts
