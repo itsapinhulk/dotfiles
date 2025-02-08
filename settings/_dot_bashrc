@@ -171,6 +171,10 @@ bind '"\e[B": history-search-forward'
 
 # Useful bash functions
 
+function apt_upgrade_packages() {
+  sudo apt update && sudo apt --yes upgrade && sudo apt --yes autoremove
+}
+
 # Test performance of disk backing current folder, no idea how accurate this methodology is
 function disk_performance() {
     local _file_size=256kB
