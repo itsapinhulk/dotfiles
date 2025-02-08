@@ -92,6 +92,18 @@ function source_conda_install() {
   if [[ -f "${HOME}/Software/miniconda/etc/profile.d/conda.sh" ]]; then
     source "${HOME}/Software/miniconda/etc/profile.d/conda.sh"
     source "${_DOTFILES_DIR}/ext/conda-bash-completion/conda"
+  else
+    echo "Missing conda installation"
+  fi
+}
+
+function source_nvm_install() {
+  if [[ -d "${HOME}/.config/nvm" ]]; then
+    export NVM_DIR="${HOME}/.config/nvm"
+    [[ -s "${NVM_DIR}/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
+    [[ -s "${NVM_DIR}/bash_completion" ]] && source "$NVM_DIR/bash_completion"
+  else
+    echo "Missing nvm installation"
   fi
 }
 
