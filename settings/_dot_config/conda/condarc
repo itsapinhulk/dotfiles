@@ -1,4 +1,5 @@
 show_channel_urls: true
+ssl_verify: true
 channels:
   - conda-forge
   - defaults
