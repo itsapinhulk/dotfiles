@@ -70,6 +70,9 @@ fi
 
 if command -v dircolors &> /dev/null; then
     eval `dircolors ${_DOTFILES_DIR}/ext/dircolors-solarized/dircolors.256dark`
+else
+  export CLICOLOR=1
+  export LSCOLORS=GxFxCxDxBxegedabagaced
 fi
 
 # All bash completions
