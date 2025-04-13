@@ -1,0 +1,71 @@
+"$schema" = "https://jj-vcs.github.io/jj/latest/config-schema.json"
+
+[ui]
+editor = "nvim"
+diff.format = "git"
+default-command = "log"
+
+[ui.movement]
+edit = true
+
+[colors]
+# Highlight hunks with background
+"diff removed token" = { bg = "#221111", underline = false }
+"diff added token" = { bg = "#002200", underline = false }
+
+[template-aliases]
+# Relative timestamp rendered as "x days/hours/seconds ago"
+'format_timestamp(timestamp)' = 'timestamp.ago()'
+
+# Display shorter id
+'format_short_id(id)' = 'id.shortest(4)'
+
+# Only show name of the author
+'format_short_signature(signature)' = 'signature.name()'
+
+# Customize the alias used in log command to show information compactly, and -
+# 1. Highlight anonymous commit with changes
+'format_short_commit_header(commit)' = '''
+separate(" ",
+  format_short_change_id_with_hidden_and_divergent_info(commit) ++ "/" ++
+  format_short_commit_id(commit.commit_id()),
+  "(" ++ format_timestamp(commit_timestamp(commit)) ++ ")",
+  if(current_working_copy && (!description) && (!commit.empty()), "(DIRTY)"),
+  commit.bookmarks(),
+  commit.tags(),
+  commit.working_copies(),
+  if(commit.conflict(), label("conflict", "confict")),
+  if(config("ui.show-cryptographic-signatures").as_boolean(),
+    "{" ++ format_short_cryptographic_signature(commit.signature()) ++ "}"),
+  "[" ++ format_short_signature(commit.author()) ++ "]",
+)
+'''
+
+[revset-aliases]
+# Customize the set of immutable_heads,, in addition to built-in ones
+# Any changes NOT made by current user are immutable
+# Remote bookmarks considered immutable to avoid accidentally overwriting them.
+# Note that local only bookmarks are NOT considered immutable, only remote bookmarks are.
+"immutable_heads()" = "builtin_immutable_heads() | remote_bookmarks() | (trunk().. & ~mine())"
+
+# All visible heads by current author
+"my_heads()" = "visible_heads() & mine()"
+
+# The following changes will be shown by default for the `log` command
+# 1. Tips of remote bookmarks and any its decendents
+# 2. Al local bookmarks, the latest tag, the tip of trunk and working copy
+# For all the above we add one more commit for context. 
+"default_log()" ='''
+ancestors(present(
+  tracked_remote_bookmarks() | tracked_remote_bookmarks()::|
+  bookmarks()|latest(tags(), 1)|trunk()|@
+), 2)
+'''
+
+[revsets]
+log='default_log()'
+
+[templates]
+# Show additional stats for the commit first
+show = 'builtin_log_detailed ++ diff.summary() ++ "\n" ++ diff.stat() ++ "\n"'
+
