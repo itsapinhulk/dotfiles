@@ -80,16 +80,31 @@ if [[ -f "/etc/profile.d/bash_completion.sh" ]]; then
   source "/etc/profile.d/bash_completion.sh"
 fi
 
-source "${_DOTFILES_DIR}/ext/git/contrib/completion/git-completion.bash"
 source "${_DOTFILES_DIR}/ext/tmux-bash-completion/completions/tmux"
 
 if [[ -f "/usr/local/etc/bash_completion" ]]; then
   source "/usr/local/etc/bash_completion"
 fi
 
-if [[ -f "${HOMEBREW_PREFIX}/etc/bash_completion.d/git-completion.bash" ]]; then
-  source "${HOMEBREW_PREFIX}/etc/bash_completion.d/git-completion.bash"
-fi
+function source_git_helpers() {
+  source "${_DOTFILES_DIR}/ext/git/contrib/completion/git-completion.bash"
+  if [[ -f "${HOMEBREW_PREFIX}/etc/bash_completion.d/git-completion.bash" ]]; then
+    source "${HOMEBREW_PREFIX}/etc/bash_completion.d/git-completion.bash"
+  fi
+
+  # Setup git related helpers if available
+  if [[ -f "/etc/bash_completion.d/git-prompt" ]]; then
+    source "/etc/bash_completion.d/git-prompt"
+  fi
+
+  source "${_DOTFILES_DIR}/ext/git/contrib/completion/git-prompt.sh"
+
+  GIT_PS1_SHOWDIRTYSTATE=1
+  GIT_PS1_SHOWUNTRACKEDFILES=1
+  GIT_PS1_SHOWUPSTREAM="verbose"
+  GIT_PS1_SHOWCOLORSHINT=1
+  PROMPT_COMMAND='__git_ps1 "$(_ps1_pre)" "$(_ps1_post)"'
+}
 
 if command -v jj &> /dev/null; then
   source <(jj util completion bash)
@@ -139,8 +154,8 @@ function _ps1_time() {
 function _ps1_pre() {
   # Unfortuantely conda prompt includes a space at the end, we need to
   # follow its convention in including its space
-  _PS1_WITH_CONDA="$(_ps1_time) ${_CONDA_COLOR}${CONDA_PROMPT_MODIFIER}"
-  echo "${_PS1_WITH_CONDA}${_PS1_USER_HOST} ${_PS1_WORKDIR}${_VCS_COLOR}"
+  _PS1_WITH_CONDA="${_CONDA_COLOR}${CONDA_PROMPT_MODIFIER}"
+  echo "$(_ps1_time) ${_PS1_USER_HOST} ${_PS1_WORKDIR} ${_PS1_WITH_CONDA} ${_VCS_COLOR}"
 }
 
 # Grapes by default
@@ -158,19 +173,11 @@ function _ps1_post() {
   echo "\n$(_ps1_os_icon) ${_PROMPT_COLOR}\\\$ ${_RESET_COLOR}"
 }
 
-# Setup git related helpers if available
-if [[ -f "/etc/bash_completion.d/git-prompt" ]]; then
-  source "/etc/bash_completion.d/git-prompt"
-fi
+function _regular_ps1() {
+  PS1="$(_ps1_pre) $(_ps1_post)"
+}
 
-source "${_DOTFILES_DIR}/ext/git/contrib/completion/git-prompt.sh"
-
-GIT_PS1_SHOWDIRTYSTATE=1
-GIT_PS1_SHOWUNTRACKEDFILES=1
-GIT_PS1_SHOWUPSTREAM="verbose"
-GIT_PS1_SHOWCOLORSHINT=1
-PROMPT_COMMAND='__git_ps1 "$(_ps1_pre)" "$(_ps1_post)"'
-
+PROMPT_COMMAND='_regular_ps1'
 
 # Use current input when searching with arrow keys
 bind '"\e[A": history-search-backward'
