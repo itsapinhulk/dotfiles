@@ -2,10 +2,6 @@
     path = ext/dircolors-solarized
     url = https://github.com/seebi/dircolors-solarized.git
     shallow = true
-[submodule "ext/source-code-pro"]
-    path = ext/source-code-pro
-    url = https://github.com/adobe-fonts/source-code-pro.git
-    shallow = true
 [submodule "ext/tmux-bash-completion"]
     path = ext/tmux-bash-completion
     url = https://github.com/imomaliev/tmux-bash-completion.git

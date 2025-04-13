@@ -40,8 +40,4 @@ Add to ~/.gitconfig -
 ```
 
 ### Fonts
-```
-mkdir -p ~/.fonts
-cp -r ext/source-code-pro/OTF/*.otf ~/.fonts
-fc-cache -f -v
-```
+Install any font in `fonts/`
