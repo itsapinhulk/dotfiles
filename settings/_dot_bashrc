@@ -91,6 +91,10 @@ if [[ -f "${HOMEBREW_PREFIX}/etc/bash_completion.d/git-completion.bash" ]]; then
   source "${HOMEBREW_PREFIX}/etc/bash_completion.d/git-completion.bash"
 fi
 
+if command -v jj &> /dev/null; then
+  source <(jj util completion bash)
+fi
+
 function source_conda_install() {
   if [[ -f "${HOME}/Software/miniconda/etc/profile.d/conda.sh" ]]; then
     source "${HOME}/Software/miniconda/etc/profile.d/conda.sh"
