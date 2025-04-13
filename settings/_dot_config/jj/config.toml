@@ -53,12 +53,13 @@ separate(" ",
 
 # The following changes will be shown by default for the `log` command
 # 1. Tips of remote bookmarks and any its decendents
-# 2. Al local bookmarks, the latest tag, the tip of trunk and working copy
-# For all the above we add one more commit for context. 
+# 2. All local bookmarks, the latest tag, the tip of trunk,
+#   commits by current author and working copy
+# For all the above we add one more commit for context.
 "default_log()" ='''
 ancestors(present(
   tracked_remote_bookmarks() | tracked_remote_bookmarks()::|
-  bookmarks()|latest(tags(), 1)|trunk()|@
+  bookmarks()|latest(tags(), 1)|trunk()|my_heads()|@
 ), 2)
 '''
 
