@@ -11,8 +11,7 @@ Setup soft links -
 # Bash setting
 settings/_dot_bashrc                    -> ~/.bashrc
 
-# Vim and NeoVim settings
-settings/_dot_config/nvim/init.vim      -> ~/.config/nvim/init.vim
+# Ideamvim settings
 settings/_dot_ideavimrc                 -> ~/.ideavimrc
 
 # Tmux config
@@ -38,6 +37,28 @@ Add to ~/.gitconfig -
 [include]
     path = /path/to/dotfiles/settings/_dot_gitconfig
 ```
+
+### NeoVim
+
+1. Install `lua` and `luarocks`
+
+2. Either copy the contents of (for further customization) or link to `init.lua`
+
+    ```
+    settings/_dot_config/nvim/init.lua      -> ~/.config/nvim/init.lua
+    ```
+
+3. Create a soft link for the default set of configs
+
+    ```
+    settings/_dot_config/nvim/lua      -> ~/.config/nvim/lua
+    ```
+    or
+
+    ```
+    settings/_dot_config/nvim/lua/config      -> ~/.config/nvim/lua/config
+    settings/_dot_config/nvim/lua/plugins     -> ~/.config/nvim/lua/plugins
+    ```
 
 ### Fonts
 Install any font in `fonts/`
