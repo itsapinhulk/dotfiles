@@ -40,7 +40,7 @@ Add to ~/.gitconfig -
 
 ### NeoVim
 
-1. Install `lua` and `luarocks`
+1. Install `ripgrep`, `fd`, `node`, `cmake`, `lua` and `luarocks`
 
 2. Either copy the contents of (for further customization) or link to `init.lua`
 
