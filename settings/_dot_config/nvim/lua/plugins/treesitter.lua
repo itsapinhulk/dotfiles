@@ -10,6 +10,7 @@ return {
             "markdown", "markdown_inline", "rust", "java", "go", "python", "javascript", "tsx",
             "typescript", "html", "css", "matlab", "bash", "cmake", "csv", "cuda", "sql",
             "yaml", "kotlin", "json", "diff", "asm", "haskell", "ini", "toml", "wgsl", "glsl",
+            "proto", "textproto", "thrift",
           },
           auto_install = false,
           sync_install = false,
