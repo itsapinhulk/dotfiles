@@ -3,7 +3,7 @@ return {
   cmd = { "DiffEditor" },
   dependencies = {
     "MunifTanjim/nui.nvim",
-    "ryanoasis/vim-devicons",
+    "nvim-tree/nvim-web-devicons",
   },
   config = function()
     require("hunk").setup()
