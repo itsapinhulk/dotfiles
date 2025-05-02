@@ -45,12 +45,15 @@ separate(" ",
 [revset-aliases]
 # Customize the set of immutable_heads,, in addition to built-in ones
 # Any changes NOT made by current user are immutable
-# Remote bookmarks considered immutable to avoid accidentally overwriting them.
+# Remote bookmarks (all non-local changes) are considered immutable to avoid accidentally
+#   overwriting them.
 # Note that local only bookmarks are NOT considered immutable, only remote bookmarks are.
-"immutable_heads()" = "builtin_immutable_heads() | remote_bookmarks() | (trunk().. & ~mine())"
+"immutable_heads()" = '''
+builtin_immutable_heads() | (trunk()..remote_bookmarks()) | (trunk().. & ~mine())
+'''
 
-# All visible heads by current author
-"my_heads()" = "visible_heads() & mine()"
+# All visible heads by current author, including from remote
+"my_heads()" = "(visible_heads() | remote_bookmarks() ) & mine()"
 
 # The following changes will be shown by default for the `log` command
 # 1. Tips of remote bookmarks and any its decendents
@@ -59,8 +62,9 @@ separate(" ",
 # For all the above we add one more commit for context.
 "default_log()" ='''
 ancestors(present(
-  tracked_remote_bookmarks() | tracked_remote_bookmarks()::|
-  bookmarks()|latest(tags(), 1)|trunk()|my_heads()|@
+  tracked_remote_bookmarks() | tracked_remote_bookmarks():: |
+  bookmarks()|latest(tags(), 1)|trunk()|@|
+  (trunk()..my_heads())
 ), 2)
 '''
 
