@@ -3,7 +3,7 @@
 [ui]
 editor = "nvim"
 diff.format = "git"
-default-command = "log"
+default-command = ["log", "-n", "10"]
 diff-editor = ["nvim", "-c", "DiffEditor $left $right $output"]
 
 [ui.movement]
@@ -13,6 +13,12 @@ edit = true
 # Highlight hunks with background
 "diff removed token" = { bg = "#221111", underline = false }
 "diff added token" = { bg = "#002200", underline = false }
+
+[aliases]
+# Aliases to show other log variants
+mlog = ["log", "-r", "more_log()"]
+rlog = ["log", "-r", "remote_log()"]
+tlog = ["log", "-r", "trunk_log()"]
 
 [template-aliases]
 # Relative timestamp rendered as "x days/hours/seconds ago"
@@ -26,7 +32,7 @@ edit = true
 
 # Customize the alias used in log command to show information compactly, and -
 # 1. Highlight anonymous commit with changes
-'format_short_commit_header(commit)' = '''
+'format_short_commit_header(commit)' = """
 separate(" ",
   format_short_change_id_with_hidden_and_divergent_info(commit) ++ "/" ++
   format_short_commit_id(commit.commit_id()),
@@ -40,7 +46,7 @@ separate(" ",
     "{" ++ format_short_cryptographic_signature(commit.signature()) ++ "}"),
   "[" ++ format_short_signature(commit.author()) ++ "]",
 )
-'''
+"""
 
 [revset-aliases]
 # Customize the set of immutable_heads,, in addition to built-in ones
@@ -48,25 +54,42 @@ separate(" ",
 # Remote bookmarks (all non-local changes) are considered immutable to avoid accidentally
 #   overwriting them.
 # Note that local only bookmarks are NOT considered immutable, only remote bookmarks are.
-"immutable_heads()" = '''
+"immutable_heads()" = """
 builtin_immutable_heads() | (trunk()..remote_bookmarks()) | (trunk().. & ~mine())
-'''
+"""
 
 # All visible heads by current author, including from remote
 "my_heads()" = "(visible_heads() | remote_bookmarks() ) & mine()"
 
 # The following changes will be shown by default for the `log` command
-# 1. Tips of remote bookmarks and any its decendents
+# 1. Tips of remote bookmarks
 # 2. All local bookmarks, the latest tag, the tip of trunk,
 #   commits by current author and working copy
 # For all the above we add one more commit for context.
-"default_log()" ='''
+"default_log()" = """
 ancestors(present(
-  tracked_remote_bookmarks() | tracked_remote_bookmarks():: |
+  tracked_remote_bookmarks() |
   bookmarks()|latest(tags(), 1)|trunk()|@|
   (trunk()..my_heads())
 ), 2)
-'''
+"""
+
+# Intended to show everything which might be relevant because it after the trunk change
+"more_log()" = """
+ancestors(present(
+  default_log() | (trunk()::)
+), 2)
+"""
+
+# Intended to show every possible remote commit, except those in trunk
+"remote_log()" = """
+ancestors(present(
+  more_log() | ((trunk()::remote_bookmarks())::)
+), 2)
+"""
+
+# History of changes in trunk
+"trunk_log()" = """::trunk()"""
 
 [revsets]
 log='default_log()'
