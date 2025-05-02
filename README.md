@@ -61,4 +61,5 @@ Add to ~/.gitconfig -
     ```
 
 ### Fonts
-Install any font in `fonts/`
+Install any font in `fonts/` (using `./scripts/install_fonts.sh` on Linux)
+
