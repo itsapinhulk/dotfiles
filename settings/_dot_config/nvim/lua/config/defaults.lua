@@ -7,21 +7,21 @@ vim.o.mouse='a'         -- Enable all mouse support
 vim.o.hlsearch=true     -- Highlight searchBresults
 
 -- 2 spaces for a tab
-vim.o.tabstop=2   
-vim.o.softtabstop=2 
+vim.o.tabstop=2
+vim.o.softtabstop=2
 vim.o.shiftwidth=2
 vim.o.expandtab=true  -- Convert tabs to spaces
 
 -- Allow interop with System clipboard
-vim.opt.clipboard:append{'unnamedplus'} 
+vim.opt.clipboard:append{'unnamedplus'}
 
 -- Indent a new line with same amount as current line
-vim.o.autoindent=true 
+vim.o.autoindent=true
 
 vim.o.number=true   -- Show line numbers
 
 -- Hightlight current line and number
-vim.o.cursorline=true 
+vim.o.cursorline=true
 vim.o.cursorlineopt='both'
 
 -- Bash-like tab completions
@@ -45,3 +45,8 @@ vim.o.undofile=true
 vim.o.undolevels=1000
 vim.o.undoreload=10000
 
+-- Autosave on losing focus, ignore any errors
+vim.api.nvim_create_autocmd({"BufLeave", "FocusLost"}, {
+  pattern = {"*"},
+  command = "silent! wall",
+})
