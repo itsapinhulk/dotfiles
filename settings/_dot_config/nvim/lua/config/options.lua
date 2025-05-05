@@ -1,3 +1,6 @@
+-- Options are automatically loaded before lazy.nvim startup
+-- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
+--
 vim.o.encoding='utf-8'
 
 vim.o.compatible=false  -- Disable compatibility with old-time vi
@@ -19,6 +22,7 @@ vim.opt.clipboard:append{'unnamedplus'}
 vim.o.autoindent=true
 
 vim.o.number=true   -- Show line numbers
+vim.o.relativenumber=false   -- Do not show relative line numbers
 
 -- Hightlight current line and number
 vim.o.cursorline=true
@@ -38,7 +42,7 @@ vim.opt.backspace = {'indent', 'eol', 'start'}
 
 vim.o.colorcolumn='101'     -- Suggestion for maximum line width
 
-vim.o.foldlevel=1   -- Start with some folds open
+vim.o.foldlevel=2   -- Start with some folds open
 
 -- Save undo after file closes and long history (num and lines)
 vim.o.undofile=true
@@ -50,3 +54,9 @@ vim.api.nvim_create_autocmd({"BufLeave", "FocusLost"}, {
   pattern = {"*"},
   command = "silent! wall",
 })
+
+-- Disable autoformat
+vim.g.autoformat = false
+
+-- Do not conceal anything
+vim.o.conceallevel = 0

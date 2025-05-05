@@ -40,7 +40,7 @@ Add to ~/.gitconfig -
 
 ### NeoVim
 
-1. Install `ripgrep`, `fd`, `node`, `cmake`, `lua` and `luarocks`
+1. Install `ripgrep`, `fzf`, `fd`, `cmake`, `lua(5.1)` and `luarocks(3+)`
 
 2. Either copy the contents of (for further customization) or link to `init.lua`
 
@@ -51,8 +51,10 @@ Add to ~/.gitconfig -
 3. Create a soft link for the default set of configs
 
     ```
-    settings/_dot_config/nvim/lua      -> ~/.config/nvim/lua
+    settings/_dot_config/nvim/lua                   -> ~/.config/nvim/lua
+    settings/_dot_config/nvim/_dot_neoconf.json     -> ~/.config/nvim/.neoconf.json
     ```
+
     or
 
     ```
