@@ -60,3 +60,7 @@ vim.g.autoformat = false
 
 -- Do not conceal anything
 vim.o.conceallevel = 0
+
+-- Word wrap
+vim.o.wrap = true
+vim.o.linebreak = true
