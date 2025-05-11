@@ -2,19 +2,7 @@
     path = ext/dircolors-solarized
     url = https://github.com/seebi/dircolors-solarized.git
     shallow = true
-[submodule "ext/tmux-bash-completion"]
-    path = ext/tmux-bash-completion
-    url = https://github.com/imomaliev/tmux-bash-completion.git
-    shallow = true
 [submodule "ext/tmux-conf"]
     path = ext/tmux-conf
     url = https://github.com/gpakosz/.tmux.git
-    shallow = true
-[submodule "ext/git"]
-    path = ext/git
-    url = https://github.com/git/git.git
-    shallow = true
-[submodule "ext/conda-bash-completion"]
-    path = ext/conda-bash-completion
-    url = https://github.com/tartansandal/conda-bash-completion.git
     shallow = true

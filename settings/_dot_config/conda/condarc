@@ -1,5 +1,13 @@
+auto_activate_base: false
+
 show_channel_urls: true
 ssl_verify: true
+
 channels:
   - conda-forge
   - defaults
+
+envs_dirs:
+  - ${XDG_STATE_HOME}/conda/envs
+pkgs_dirs:
+  - ${XDG_STATE_HOME}/conda/pkgs

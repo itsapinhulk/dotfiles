@@ -10,6 +10,10 @@ if [[ "$(uname)" == 'Darwin' ]]; then
 fi
 
 export XDG_CONFIG_HOME=$HOME/.config
+export XDG_CACHE_HOME=$HOME/.cache
+export XDG_DATA_HOME=$HOME/.local/share
+export XDG_STATE_HOME=$HOME/.local/state
+
 export FIGNORE=$FIGNORE:DS_Store
 
 if ls --version &> /dev/null; then
@@ -60,8 +64,7 @@ shopt -s histappend
 # update the values of LINES and COLUMNS.
 shopt -s checkwinsize
 
-# Use dotfiles directory
-
+# Set up dotfiles directory
 if command -v realpath &> /dev/null; then
     _DOTFILES_DIR=$(cd $(dirname $(realpath ${BASH_SOURCE[0]})) && cd .. && pwd)
 else
@@ -75,30 +78,7 @@ else
   export LSCOLORS=GxFxCxDxBxegedabagaced
 fi
 
-# All bash completions
-if [[ -f "/etc/profile.d/bash_completion.sh" ]]; then
-  source "/etc/profile.d/bash_completion.sh"
-fi
-
-source "${_DOTFILES_DIR}/ext/tmux-bash-completion/completions/tmux"
-
-if [[ -f "/usr/local/etc/bash_completion" ]]; then
-  source "/usr/local/etc/bash_completion"
-fi
-
 function source_git_helpers() {
-  source "${_DOTFILES_DIR}/ext/git/contrib/completion/git-completion.bash"
-  if [[ -f "${HOMEBREW_PREFIX}/etc/bash_completion.d/git-completion.bash" ]]; then
-    source "${HOMEBREW_PREFIX}/etc/bash_completion.d/git-completion.bash"
-  fi
-
-  # Setup git related helpers if available
-  if [[ -f "/etc/bash_completion.d/git-prompt" ]]; then
-    source "/etc/bash_completion.d/git-prompt"
-  fi
-
-  source "${_DOTFILES_DIR}/ext/git/contrib/completion/git-prompt.sh"
-
   GIT_PS1_SHOWDIRTYSTATE=1
   GIT_PS1_SHOWUNTRACKEDFILES=1
   GIT_PS1_SHOWUPSTREAM="verbose"
@@ -106,24 +86,36 @@ function source_git_helpers() {
   PROMPT_COMMAND='__git_ps1 "$(_ps1_pre)" "$(_ps1_post)"'
 }
 
+if command -v brew &>/dev/null; then
+  HOMEBREW_PREFIX="$(brew --prefix)"
+  if [[ -r "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh" ]]; then
+    source "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh"
+  else
+    for COMPLETION in "${HOMEBREW_PREFIX}/etc/bash_completion.d/"*; do
+      [[ -r "${COMPLETION}" ]] && source "${COMPLETION}"
+    done
+  fi
+fi
+
 if command -v jj &> /dev/null; then
   source <(jj util completion bash)
 fi
 
 function source_conda_install() {
-  if [[ -f "${HOME}/Software/miniconda/etc/profile.d/conda.sh" ]]; then
-    source "${HOME}/Software/miniconda/etc/profile.d/conda.sh"
-    source "${_DOTFILES_DIR}/ext/conda-bash-completion/conda"
+  if command -v conda &> /dev/null; then
+    eval "$(conda "shell.$(basename "${SHELL}")" hook)"
   else
     echo "Missing conda installation"
   fi
 }
 
 function source_nvm_install() {
-  if [[ -d "${HOME}/.config/nvm" ]]; then
-    export NVM_DIR="${HOME}/.config/nvm"
-    [[ -s "${NVM_DIR}/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
-    [[ -s "${NVM_DIR}/bash_completion" ]] && source "$NVM_DIR/bash_completion"
+  if command -v brew &> /dev/null; then
+    export NVM_DIR="${XDG_CONFIG_HOME}/nvm"
+    # This loads nvm
+    [[ -s "${HOMEBREW_PREFIX}/opt/nvm/nvm.sh" ]] && source "${HOMEBREW_PREFIX}/opt/nvm/nvm.sh" 
+    # This loads nvm bash_completion
+    [[ -s "${HOMEBREW_PREFIX}/opt/nvm/etc/bash_completion.d/nvm" ]] && source "${HOMEBREW_PREFIX}/opt/nvm/etc/bash_completion.d/nvm" 
   else
     echo "Missing nvm installation"
   fi
@@ -212,7 +204,7 @@ function disk_performance() {
 
 # Single command to start all tmux sessions
 function tmux_start_server() {
-    for _file in $(ls ~/.config/tmuxp/); do
+    for _file in $(ls ${XDG_CONFIG_HOME}/tmuxp/); do
         local _session_name="${_file%.*}"
         # Load the session in the background
         tmuxp load "${_session_name}" -d
