@@ -102,8 +102,8 @@ if command -v jj &> /dev/null; then
 fi
 
 function source_conda_install() {
-  if command -v conda &> /dev/null; then
-    eval "$(conda "shell.$(basename "${SHELL}")" hook)"
+  if [[ -f "${HOME}/Software/miniconda/etc/profile.d/conda.sh" ]]; then
+    source "${HOME}/Software/miniconda/etc/profile.d/conda.sh"
   else
     echo "Missing conda installation"
   fi

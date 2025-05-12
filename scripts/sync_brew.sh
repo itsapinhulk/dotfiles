@@ -3,10 +3,12 @@ brew install \
   bash \
   bash-completion@2 \
   fd \
+  fzf \
   git \
   git-lfs \
   jj \
-  miniconda \
+  lua \
+  luarocks \
   neovim \
   nvm \
   ripgrep \
