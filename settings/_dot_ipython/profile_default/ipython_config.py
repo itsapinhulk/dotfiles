@@ -34,7 +34,10 @@ c = get_config()  #noqa
 
 ## lines of code to run at IPython startup.
 #  Default: []
-# c.InteractiveShellApp.exec_lines = []
+c.InteractiveShellApp.exec_lines = []
+# Enable autoreload
+c.InteractiveShellApp.exec_lines.append('%load_ext autoreload')
+c.InteractiveShellApp.exec_lines.append('%autoreload all')
 
 ## A list of dotted module names of IPython extensions to load.
 #  Default: []
