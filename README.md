@@ -73,7 +73,7 @@ Install any font in `fonts/` (using `./scripts/install_fonts.sh` on Linux)
 ### ipython and Jupyter(lab)
 
 1. For ipython, run `ipython profile create`
-2. Replace `~/.ipython/profile_default/ipython_config.py` with link to `_dot_ipython/profile_default/ipython_config.py`
+2. Replace `~/.ipython/profile_default/ipython_config.py` with link to `settings/_dot_ipython/profile_default/ipython_config.py`
 
 3. For Jupyter, run `jupyter lab --generate-config`
-4. Replace `~/.jupyter/jupyter_lab_config.py` with link to `_dot_jupyter/jupyter_lab_config.py`
+4. Replace `~/.jupyter/jupyter_lab_config.py` with link to `settings/_dot_jupyter/jupyter_lab_config.py`
