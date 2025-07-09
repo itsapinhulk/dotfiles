@@ -21,8 +21,9 @@ rlog = ["log", "-r", "remote_log()"]
 tlog = ["log", "-r", "trunk_log()"]
 hlog = ["log", "-r", "my_heads_log()"]
 hist = ["log", "-r", "branch_history(@)"]
+alog = ["log", "-r", "all()"]
 
-# Show summary of commit wihthout all the changes
+# Show summary of commit without all the changes
 view = ["show", "--no-patch"]
 
 [template-aliases]
@@ -82,14 +83,14 @@ builtin_immutable_heads() | (trunk()..remote_bookmarks()) | (trunk().. & ~mine()
 
 # Intended to show everything which might be relevant because it after the trunk change
 "more_log_()" = """
-  default_log() | (trunk()::)
+  default_log_() | (trunk()::)
 """
 
 "more_log()" = "_add_log_context(more_log_())"
 
 # Intended to show every possible remote commit, except those in trunk
 "remote_log_()" = """
-  more_log() | ((trunk()::remote_bookmarks())::)
+  more_log_() | ((trunk()::remote_bookmarks())::)
 """
 
 "remote_log()" = "_add_log_context(remote_log_())"
