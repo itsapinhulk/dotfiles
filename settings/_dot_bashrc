@@ -110,6 +110,17 @@ function source_conda_install() {
     echo "Missing conda installation"
   fi
 }
+export -f source_conda_install
+
+function activate_conda_env() {
+  # Load conda if not already available
+  if ! command -v conda &> /dev/null; then
+    source_conda_install
+  fi
+
+  conda activate "$1"
+}
+export -f activate_conda_env
 
 function source_nvm_install() {
   if command -v brew &> /dev/null; then
@@ -122,6 +133,7 @@ function source_nvm_install() {
     echo "Missing nvm installation"
   fi
 }
+export -f source_nvm_install
 
 # Set default editor
 EDITOR=nvim
@@ -173,6 +185,11 @@ function _regular_ps1() {
 }
 
 PROMPT_COMMAND='_regular_ps1'
+
+# Needs to be after PROMPT_COMMAND is set up.
+if command -v direnv &> /dev/null; then
+  eval "$(direnv hook bash)"
+fi
 
 # Use current input when searching with arrow keys
 bind '"\e[A": history-search-backward'

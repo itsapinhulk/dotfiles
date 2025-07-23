@@ -1,5 +1,9 @@
-/.idea
-/.vscode
+/.idea/
+/.vscode/
+/.zed/
+/.envrc
 
 *.swp
 *.pyc
+
+compile_commands.json

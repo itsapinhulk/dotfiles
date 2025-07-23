@@ -4,6 +4,7 @@ brew install --quiet \
   bash-completion@2 \
   cmake \
   curl \
+  direnv \
   fd \
   fzf \
   git \
