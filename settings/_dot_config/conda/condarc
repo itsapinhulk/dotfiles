@@ -6,8 +6,3 @@ ssl_verify: true
 channels:
   - conda-forge
   - defaults
-
-envs_dirs:
-  - ${XDG_STATE_HOME}/conda/envs
-pkgs_dirs:
-  - ${XDG_STATE_HOME}/conda/pkgs
