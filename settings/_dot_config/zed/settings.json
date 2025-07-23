@@ -7,13 +7,97 @@
 // custom settings, run the `open default settings` command
 // from the command palette or from `Zed` application menu.
 {
-  "theme": "Dracula",
-  "vim_mode": true,
-  "base_keymap": "VSCode",
-  "ui_font_size": 16,
-  "buffer_font_size": 16,
-  "telemetry": {
-    "diagnostics": false,
-    "metrics": false
-  }
+    // Edit predictions
+    "edit_predictions": {
+        "mode": "subtle",
+        "enabled_in_text_threads": false
+    },
+    "features": {
+        "edit_prediction_provider": "zed"
+    },
+
+    "ui_font_size": 24,
+    "icon_theme": "Catppuccin Mocha",
+    "theme": "Dracula Solid",
+
+    "base_keymap": "VSCode",
+
+    "vim_mode": true,
+    "vim": {
+        "use_system_clipboard": "always"
+    },
+
+    // Disable all telemetry
+    "telemetry": {
+        "diagnostics": false,
+        "metrics": false
+    },
+
+    // Workspace restoration behavior.
+    "restore_on_startup": "last_session", // All workspaces
+    // Attempt to restore previous file's state when opening it again.
+    "restore_on_file_reopen": true,
+    // Do not automatically close files that have been deleted on disk.
+    "close_on_file_delete": false,
+
+    // Add new line on save.
+    "ensure_final_newline_on_save": true,
+    // Do not automatically format.
+    "format_on_save": "off",
+    // Automatically add closing brackets.
+    "use_autoclose": true,
+    // Tab size.
+    "tab_size": 4,
+
+    // Automatically install the following extensions
+    // The list of currently installed extensions can be found in
+    // ls ~/Library/Application\ Support/Zed/extensions/installed/
+    // or,
+    // ls ~/.local/share/zed/extensions/installed
+    "auto_install_extensions": {
+        "html": true,
+        "matlab": true,
+        "catppuccin-icons": true,
+        "dracula": true,
+        "make": true
+    },
+
+    // Save file on focus change.
+    "autosave": "on_focus_change",
+    "remove_trailing_whitespace_on_save": true,
+
+    // Font settings
+    "buffer_font_family": "SauceCodePro Nerd Font Mono",
+    "buffer_font_size": 21,
+    "buffer_line_height": { "custom": 1.6 },
+
+    // Other UI settings
+    "cursor_shape": "bar",
+
+    "tabs": {
+        "file_icons": true,
+        "activate_on_close": "left_neighbour"
+    },
+
+    "journal": {
+        "hour_format": "hour24"
+    },
+
+    "preferred_line_length": 120,
+    "soft_wrap": "preferred_line_length",
+
+    // Do not show git blame by default.
+    "git": {
+        "inline_blame": {
+            "enabled": false
+        }
+    },
+
+    // Disable chat and collaboration
+    "chat_panel": {
+        "button": "never"
+    },
+    "collaboration_panel": {
+        "button": false
+    }
 }
