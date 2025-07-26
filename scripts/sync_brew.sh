@@ -11,6 +11,7 @@ brew install --quiet \
   git-lfs \
   ipython \
   jj \
+  jq \
   jupyterlab \
   lua \
   luarocks \
