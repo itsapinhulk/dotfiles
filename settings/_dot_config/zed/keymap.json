@@ -27,10 +27,18 @@
         }
     },
     {
-        "context": "Editor && vim_mode == visual && !VimWaiting && !VimObject",
+        "context": "Editor && (vim_mode==visual) && !VimWaiting && !VimObject",
         "bindings": {
             "p": ["vim::Paste", { "preserve_clipboard": true }],
             "shift-p": ["vim::Paste", { "preserve_clipboard": true }]
+        }
+    },
+    {
+        "context": "Editor && (mode==full)",
+        "bindings": {
+            "enter" : "editor::Newline",
+            "tab" : "editor::Tab",
+            "shift-enter" : "editor::AcceptEditPrediction"
         }
     }
 ]

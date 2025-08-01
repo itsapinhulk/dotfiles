@@ -9,7 +9,7 @@
 {
     // Edit predictions
     "edit_predictions": {
-        "mode": "subtle",
+        "mode": "eager",
         "enabled_in_text_threads": false
     },
     "features": {
