@@ -13,6 +13,7 @@ brew install --quiet \
   jj \
   jq \
   jupyterlab \
+  libxml2 \
   lua \
   luarocks \
   neovim \
