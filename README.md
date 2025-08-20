@@ -38,6 +38,11 @@ Add to ~/.gitconfig -
     path = /path/to/dotfiles/settings/_dot_gitconfig
 ```
 
+```
+On Windows, enable long paths -
+git config --global core.longpaths true
+```
+
 ### NeoVim
 
 1. Install `ripgrep`, `fzf`, `fd`, `cmake`, `lua(5.1)` and `luarocks(3+)`
