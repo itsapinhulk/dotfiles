@@ -34,7 +34,7 @@
         }
     },
     {
-        "context": "Editor && (mode==full)",
+        "context": "Editor && vim_mode == insert && !menu",
         "bindings": {
             "enter" : "editor::Newline",
             "tab" : "editor::Tab",
