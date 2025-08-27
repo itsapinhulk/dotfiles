@@ -13,7 +13,7 @@
 [color]
     ui = auto
 [fetch]
-    recurseSubmodules = yes
+    recurseSubmodules = no
     prune = true
 [submodule]
     fetchJobs = 0
