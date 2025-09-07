@@ -199,8 +199,13 @@ bind '"\e[B": history-search-forward'
 
 # Useful bash functions
 
-function apt_upgrade_packages() {
-  sudo apt update && sudo apt --yes upgrade && sudo apt --yes autoremove
+_BASHRC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+function upgrade_packages() {
+  if command -v apt > /dev/null 2>&1; then
+    sudo apt update && sudo apt --yes upgrade && sudo apt --yes autoremove
+  fi
+
+  ${_BASHRC_DIR}/../scripts/sync_brew.sh
 }
 
 # Test performance of disk backing current folder, no idea how accurate this methodology is
