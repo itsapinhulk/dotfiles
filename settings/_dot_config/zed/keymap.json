@@ -34,11 +34,17 @@
         }
     },
     {
-        "context": "Editor && vim_mode == insert && !menu",
+        "context": "Editor && vim_mode == insert && mode == full",
         "bindings": {
-            "enter" : "editor::Newline",
-            "tab" : "editor::Tab",
-            "shift-enter" : "editor::AcceptEditPrediction"
+            "enter": "editor::Newline",
+            "tab": "editor::Tab",
+            "shift-enter": "editor::AcceptEditPrediction"
+        }
+    },
+    {
+        "context": "Editor && edit_prediction",
+        "bindings": {
+            "shift-enter": "editor::AcceptEditPrediction"
         }
     }
 ]
