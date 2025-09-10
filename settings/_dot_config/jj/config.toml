@@ -65,7 +65,7 @@ builtin_immutable_heads() | (trunk()..remote_bookmarks()) | (trunk().. & ~mine()
 """
 
 # All visible heads by current author, including from remote
-"my_heads()" = "(visible_heads() | remote_bookmarks() ) & mine()"
+"my_heads()" = "visible_heads() & mine()"
 
 "_add_log_context(x)" = "ancestors(present(x), 2)"
 # The following changes will be shown by default for the `log` command
@@ -110,4 +110,3 @@ log='default_log()'
 [templates]
 # Show additional stats for the commit first
 show = 'builtin_log_detailed ++ diff.summary() ++ "\n" ++ diff.stat() ++ "\n"'
-
