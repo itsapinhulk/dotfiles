@@ -437,3 +437,53 @@ function decompress() {
     return 1
   fi
 }
+
+watch_and_run() {
+  if ! command -v fswatch &> /dev/null; then
+    echo "Usage: need to have command 'fswatch' to run the $0 command"
+    return 1
+  fi
+
+  if [ "$#" -lt 2 ]; then
+    echo "Usage: watch_and_run <file1> [file2 ...] -- <command>"
+    return 1
+  fi
+
+  # Split arguments into files and command
+  files=()
+  while [[ "$1" != "--" ]]; do
+    files+=("$1")
+    shift
+    if [ $# -eq 0 ]; then
+      echo "Error: missing -- separator before command"
+      return 1
+    fi
+  done
+  shift # remove the --
+
+  cmd="$*"
+  if [[ "$#" -lt 1 ]]; then
+    echo "Error: Missing command after -- separator"
+    return 1
+  fi
+
+  echo "Watching files: ${files[*]}"
+  echo "Command: $cmd"
+  echo "Press Ctrl-C to stop."
+
+  new_batch=1
+  # Only look for file updates, and process in batches to avoid running multiple times back-to-back
+  # fswatch uses NoOp as batch marker
+  fswatch --event-flags --recursive --batch-marker --event Updated "${files[@]}" | while read -r event; do
+    if (( new_batch )); then
+      echo "--- File change detected at" $(date +"%Y-%m-%d %H:%M:%S") "---"
+      event="${event/$(pwd)\//}"
+      echo "---" "$event" "---"
+      eval "$cmd"
+      new_batch=0
+    fi
+    if [[ "${event}" == "NoOp" ]]; then
+        new_batch=1
+    fi
+  done
+}
