@@ -6,6 +6,7 @@ brew install --quiet \
   curl \
   direnv \
   fd \
+  fswatch \
   fzf \
   git \
   git-lfs \
@@ -20,6 +21,7 @@ brew install --quiet \
   ninja  \
   nvm \
   ripgrep \
+  rsync \
   the_silver_searcher \
   tmux \
   tmuxp \
