@@ -38,13 +38,30 @@
         "bindings": {
             "enter": "editor::Newline",
             "tab": "editor::Tab",
-            "shift-enter": "editor::AcceptEditPrediction"
+            "shift-enter": "editor::AcceptEditPrediction",
+            "ctrl-enter": "editor::AcceptPartialEditPrediction",
+            "ctrl-k": "assistant::InlineAssist"
         }
     },
     {
         "context": "Editor && edit_prediction",
         "bindings": {
-            "shift-enter": "editor::AcceptEditPrediction"
+            "shift-enter": "editor::AcceptEditPrediction",
+            "ctrl-enter": "editor::AcceptPartialEditPrediction"
+        }
+    },
+    {
+        "context": "Editor && edit_prediction_conflict",
+        "bindings": {
+            "shift-enter": "editor::AcceptEditPrediction",
+            "ctrl-enter": "editor::AcceptPartialEditPrediction"
+        }
+    },
+    {
+        "context": "!ContextEditor > Editor && mode == full",
+        "bindings": {
+            "ctrl-enter": "editor::AcceptPartialEditPrediction",
+            "ctrl-k": "assistant::InlineAssist"
         }
     }
 ]
