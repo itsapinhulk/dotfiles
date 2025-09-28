@@ -128,9 +128,9 @@ function source_nvm_install() {
   if command -v brew &> /dev/null; then
     export NVM_DIR="${XDG_CONFIG_HOME}/nvm"
     # This loads nvm
-    [[ -s "${HOMEBREW_PREFIX}/opt/nvm/nvm.sh" ]] && source "${HOMEBREW_PREFIX}/opt/nvm/nvm.sh" 
+    [[ -s "${HOMEBREW_PREFIX}/opt/nvm/nvm.sh" ]] && source "${HOMEBREW_PREFIX}/opt/nvm/nvm.sh"
     # This loads nvm bash_completion
-    [[ -s "${HOMEBREW_PREFIX}/opt/nvm/etc/bash_completion.d/nvm" ]] && source "${HOMEBREW_PREFIX}/opt/nvm/etc/bash_completion.d/nvm" 
+    [[ -s "${HOMEBREW_PREFIX}/opt/nvm/etc/bash_completion.d/nvm" ]] && source "${HOMEBREW_PREFIX}/opt/nvm/etc/bash_completion.d/nvm"
   else
     echo "Missing nvm installation"
   fi
@@ -470,6 +470,9 @@ watch_and_run() {
   echo "Watching files: ${files[*]}"
   echo "Command: $cmd"
   echo "Press Ctrl-C to stop."
+  echo "-----------------"
+
+  eval "$cmd"
 
   new_batch=1
   # Only look for file updates, and process in batches to avoid running multiple times back-to-back
