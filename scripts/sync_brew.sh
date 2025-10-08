@@ -3,6 +3,7 @@ brew install --quiet \
   bash \
   bash-completion@2 \
   cmake \
+  coreutils \
   curl \
   direnv \
   fd \
