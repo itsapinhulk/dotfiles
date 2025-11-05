@@ -65,7 +65,7 @@ builtin_immutable_heads() | (trunk()..remote_bookmarks()) | (trunk().. & ~mine()
 """
 
 # All visible heads by current author, including from remote
-"my_heads()" = "visible_heads() & mine() & ~tracked_remote_bookmarks()"
+"my_heads()" = "visible_heads() & mine() & ~untracked_remote_bookmarks()"
 
 "_add_log_context(x)" = "ancestors(present(x), 2)"
 # The following changes will be shown by default for the `log` command
