@@ -3,7 +3,7 @@
 [ui]
 editor = "nvim"
 diff-formatter = ":git"
-default-command = ["log", "-n", "10"]
+default-command = ["log", "-n", "20"]
 # diff-editor = ["nvim", "-c", "DiffEditor $left $right $output"]
 
 [ui.movement]
