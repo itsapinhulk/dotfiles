@@ -6,3 +6,6 @@
     path = ext/tmux-conf
     url = https://github.com/gpakosz/.tmux.git
     shallow = true
+[submodule "ext/itsapinhulk/shellutils"]
+    path = ext/itsapinhulk/shellutils
+	  url = git@github.com:itsapinhulk/shellutils.git
