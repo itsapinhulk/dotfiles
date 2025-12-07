@@ -8,4 +8,4 @@
     shallow = true
 [submodule "ext/itsapinhulk/shellutils"]
     path = ext/itsapinhulk/shellutils
-	  url = git@github.com:itsapinhulk/shellutils.git
+	  url = ../shellutils.git
