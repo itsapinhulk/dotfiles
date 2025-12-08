@@ -92,12 +92,9 @@ if [[ ! -v HOMEBREW_PREFIX ]]; then
 fi
 
 if command -v brew &>/dev/null; then
-  if [[ -r "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh" ]]; then
-    source "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh"
-  else
-    for COMPLETION in "${HOMEBREW_PREFIX}/etc/bash_completion.d/"*; do
-      [[ -r "${COMPLETION}" ]] && source "${COMPLETION}"
-    done
+  export BASH_COMPLETION_COMPAT_DIR="$(brew --prefix)/etc/bash_completion.d"
+  if [[ -r "$(brew --prefix)/share/bash-completion/bash_completion" ]]; then 
+    source "$(brew --prefix)/share/bash-completion/bash_completion"
   fi
 fi
 
