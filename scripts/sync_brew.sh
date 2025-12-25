@@ -23,6 +23,7 @@ brew install --quiet \
   nvm \
   ripgrep \
   rsync \
+  snitch \
   the_silver_searcher \
   tmux \
   tmuxp \
