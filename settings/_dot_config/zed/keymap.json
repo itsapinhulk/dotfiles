@@ -7,10 +7,17 @@
 // from the command palette.
 [
     {
+        // Global bindings
+        "bindings": {
+            "ctrl-shift-k": "agent::ToggleFocus",
+            "ctrl-?": null,
+        }
+    },
+    {
         "context": "Pane",
         "bindings": {
             "ctrl-shift-tab": "pane::ActivatePreviousItem",
-            "ctrl-tab": "pane::ActivateNextItem"
+            "ctrl-tab": "pane::ActivateNextItem",
         }
     },
     {
@@ -23,14 +30,14 @@
             "ctrl-o": "workspace::Open", // vim default: go back
             "ctrl-s": "workspace::Save", // vim default: show signature
             "ctrl-a": "editor::SelectAll", // vim default: increment
-            "ctrl-w": "pane::CloseActiveItem" // vim default: ??
+            "ctrl-w": "pane::CloseActiveItem", // vim default: ??
         }
     },
     {
         "context": "Editor && (vim_mode==visual) && !VimWaiting && !VimObject",
         "bindings": {
             "p": ["vim::Paste", { "preserve_clipboard": true }],
-            "shift-p": ["vim::Paste", { "preserve_clipboard": true }]
+            "shift-p": ["vim::Paste", { "preserve_clipboard": true }],
         }
     },
     {
@@ -39,35 +46,35 @@
             "enter": "editor::Newline",
             "tab": "editor::Tab",
             "shift-enter": "editor::AcceptEditPrediction",
-            "ctrl-enter": "editor::AcceptPartialEditPrediction",
-            "ctrl-k": "assistant::InlineAssist"
+            "ctrl-enter": "editor::AcceptNextWordEditPrediction",
+            "ctrl-k": "assistant::InlineAssist",
         }
     },
     {
         "context": "Editor && edit_prediction",
         "bindings": {
             "shift-enter": "editor::AcceptEditPrediction",
-            "ctrl-enter": "editor::AcceptPartialEditPrediction"
+            "ctrl-enter": "editor::AcceptNextWordEditPrediction",
         }
     },
     {
         "context": "Editor && edit_prediction_conflict",
         "bindings": {
             "shift-enter": "editor::AcceptEditPrediction",
-            "ctrl-enter": "editor::AcceptPartialEditPrediction"
+            "ctrl-enter": "editor::AcceptNextWordEditPrediction",
         }
     },
     {
         "context": "!ContextEditor > Editor && mode == full",
         "bindings": {
-            "ctrl-enter": "editor::AcceptPartialEditPrediction",
-            "ctrl-k": "assistant::InlineAssist"
+            "ctrl-enter": "editor::AcceptNextWordEditPrediction",
+            "ctrl-k": "assistant::InlineAssist",
         }
     },
     {
         "context": "Editor && showing_completions",
         "bindings": {
-            "enter": "editor::ConfirmCompletion"
+            "enter": "editor::ConfirmCompletion",
         }
     }
 ]
