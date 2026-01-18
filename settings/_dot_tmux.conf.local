@@ -59,3 +59,6 @@ set -g repeat-time 0
 
 # Don't enter copy mode on mouse selection
 unbind -n MouseDrag1Pane
+
+# Use regular shell instead of login shell
+set -g default-shell "${SHELL}"
