@@ -13,10 +13,10 @@
     // Edit predictions
     "edit_predictions": {
         "mode": "eager",
-        "enabled_in_text_threads": false
+        "enabled_in_text_threads": false,
     },
     "features": {
-        "edit_prediction_provider": "zed"
+        "edit_prediction_provider": "zed",
     },
 
     "ui_font_size": 24,
@@ -28,13 +28,13 @@
 
     "vim_mode": true,
     "vim": {
-        "use_system_clipboard": "always"
+        "use_system_clipboard": "always",
     },
 
     // Disable all telemetry
     "telemetry": {
         "diagnostics": false,
-        "metrics": false
+        "metrics": false,
     },
 
     // Workspace restoration behavior.
@@ -63,7 +63,7 @@
         "matlab": true,
         "catppuccin-icons": true,
         "dracula": true,
-        "make": true
+        "make": true,
     },
 
     // Save file on focus change.
@@ -80,11 +80,11 @@
 
     "tabs": {
         "file_icons": true,
-        "activate_on_close": "left_neighbour"
+        "activate_on_close": "left_neighbour",
     },
 
     "journal": {
-        "hour_format": "hour24"
+        "hour_format": "hour24",
     },
 
     "preferred_line_length": 120,
@@ -93,15 +93,12 @@
     // Do not show git blame by default.
     "git": {
         "inline_blame": {
-            "enabled": false
+            "enabled": false,
         }
     },
 
     // Disable chat and collaboration
-    "chat_panel": {
-        "button": "never"
-    },
     "collaboration_panel": {
-        "button": false
+        "button": false,
     }
 }
