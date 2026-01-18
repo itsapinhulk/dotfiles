@@ -82,3 +82,11 @@ Install any font in `fonts/` (using `./scripts/install_fonts.sh` on Linux)
 
 3. For Jupyter, run `jupyter lab --generate-config`
 4. Replace `~/.jupyter/jupyter_lab_config.py` with link to `settings/_dot_jupyter/jupyter_lab_config.py`
+
+### Default login shell
+
+To ensure the latest bash installed by `brew`, or any other non-standard installation
+outside `/bin` is used, change the default login shell -
+
+`sudo sh -c 'echo /path/to/new/bin/bash >> /etc/shells'`
+`chsh -s /path/to/new/bin/bash`
