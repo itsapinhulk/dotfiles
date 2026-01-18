@@ -17,6 +17,7 @@
     },
 
     "ui_font_size": 24,
+    "agent_buffer_font_size": 21,
     "icon_theme": "Catppuccin Mocha",
     "theme": "Dracula Solid",
 
