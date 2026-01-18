@@ -40,7 +40,7 @@ view = ["show", "--no-patch"]
 # 1. Highlight anonymous commit with changes
 'format_short_commit_header(commit)' = """
 separate(" ",
-  format_short_change_id_with_hidden_and_divergent_info(commit) ++ "/" ++
+  format_short_change_id_with_change_offset(commit) ++ "/" ++
   format_short_commit_id(commit.commit_id()),
   "(" ++ format_timestamp(commit_timestamp(commit)) ++ ")",
   if(current_working_copy && (!description) && (!commit.empty()), "(DIRTY)"),
