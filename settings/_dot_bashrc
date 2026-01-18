@@ -93,9 +93,13 @@ fi
 
 if command -v brew &>/dev/null; then
   export BASH_COMPLETION_COMPAT_DIR="$(brew --prefix)/etc/bash_completion.d"
-  if [[ -r "$(brew --prefix)/share/bash-completion/bash_completion" ]]; then 
+  if [[ -r "$(brew --prefix)/share/bash-completion/bash_completion" ]]; then
     source "$(brew --prefix)/share/bash-completion/bash_completion"
   fi
+fi
+
+if command -v _comp__split_longopt &> /dev/null; then
+    _split_longopt() { _comp__split_longopt "$@"; }
 fi
 
 if command -v jj &> /dev/null; then
@@ -221,4 +225,3 @@ function tmux_start_server() {
 # Simpler alias to load a tmux session
 alias tmux_attach="tmux attach-session -t"
 alias tmux_kill_server="tmux kill-server"
-
