@@ -9,6 +9,7 @@
 {
     "agent": {
         "dock": "bottom",
+        "default_height": 640,
     },
     // Edit predictions
     "edit_predictions": {
