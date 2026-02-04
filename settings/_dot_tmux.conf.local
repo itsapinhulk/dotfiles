@@ -61,5 +61,4 @@ set -g repeat-time 0
 unbind -n MouseDrag1Pane
 
 # Use regular shell instead of login shell
-set -gu default-command
-set -g default-shell "${SHELL}"
+set -g default-command "${SHELL}"
