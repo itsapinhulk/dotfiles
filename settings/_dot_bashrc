@@ -16,6 +16,8 @@ export XDG_STATE_HOME=$HOME/.local/state
 
 export FIGNORE=$FIGNORE:DS_Store
 
+_BASHRC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
 if ls --version &> /dev/null; then
     # Only create alias for supported ls variants
     alias ls="ls -F --color=auto"
@@ -190,6 +192,10 @@ if [[ -d ${_BASHRC_DIR}/../ext/itsapinhulk/shellutils/bash ]]; then
   export PATH=$(realpath ${_BASHRC_DIR}/../ext/itsapinhulk/shellutils/bash):$PATH
 fi
 
+if [[ -d ${_BASHRC_DIR}/../scripts ]]; then
+  export PATH=$(realpath ${_BASHRC_DIR}/../scripts):$PATH
+fi
+
 # Single command to start all tmux sessions
 function tmux-start-server() {
     for _file in $(ls ${XDG_CONFIG_HOME}/tmuxp/); do
@@ -202,3 +208,5 @@ function tmux-start-server() {
 # Simpler alias to load a tmux session
 alias tmux-attach="tmux attach-session -t"
 alias tmux-kill-server="tmux kill-server"
+
+unset _BASHRC_DIR
