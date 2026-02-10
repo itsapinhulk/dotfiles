@@ -19,6 +19,7 @@ brew "rsync"
 brew "the_silver_searcher"
 brew "tmux"
 brew "tmuxp"
+brew "uv"
 brew "wget"
 brew "zip"
 
