@@ -198,17 +198,6 @@ fi
 bind '"\e[A": history-search-backward'
 bind '"\e[B": history-search-forward'
 
-# Useful bash functions
-
-_BASHRC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-function upgrade-all-packages() {
-  if command -v apt > /dev/null 2>&1; then
-    sudo apt update && sudo apt --yes upgrade && sudo apt --yes autoremove
-  fi
-
-  ${_BASHRC_DIR}/../scripts/sync_brew.sh
-}
-
 if [[ -d ${_BASHRC_DIR}/../ext/itsapinhulk/shellutils/bash ]]; then
   export PATH=$(realpath ${_BASHRC_DIR}/../ext/itsapinhulk/shellutils/bash):$PATH
 fi
