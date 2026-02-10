@@ -74,7 +74,7 @@ else
   export LSCOLORS=GxFxCxDxBxegedabagaced
 fi
 
-function source_git_helpers() {
+function source-git-helpers() {
   GIT_PS1_SHOWDIRTYSTATE=1
   GIT_PS1_SHOWUNTRACKEDFILES=1
   GIT_PS1_SHOWUPSTREAM="verbose"
@@ -99,6 +99,7 @@ if command -v brew &>/dev/null; then
 fi
 
 if command -v _comp__split_longopt &> /dev/null; then
+    # backward compatibility for bash completion
     _split_longopt() { _comp__split_longopt "$@"; }
 fi
 
@@ -106,37 +107,24 @@ if command -v jj &> /dev/null; then
   source <(jj util completion bash)
 fi
 
-function source_conda_install() {
+function source-conda-install() {
   if [[ -f "${HOME}/Software/miniconda/etc/profile.d/conda.sh" ]]; then
     source "${HOME}/Software/miniconda/etc/profile.d/conda.sh"
   else
     echo "Missing conda installation"
   fi
 }
-export -f source_conda_install
+export -f source-conda-install
 
-function activate_conda_env() {
+function activate-conda-env() {
   # Load conda if not already available
   if ! command -v conda &> /dev/null; then
-    source_conda_install
+    source-conda-install
   fi
 
   conda activate "$1"
 }
-export -f activate_conda_env
-
-function source_nvm_install() {
-  if command -v brew &> /dev/null; then
-    export NVM_DIR="${XDG_CONFIG_HOME}/nvm"
-    # This loads nvm
-    [[ -s "${HOMEBREW_PREFIX}/opt/nvm/nvm.sh" ]] && source "${HOMEBREW_PREFIX}/opt/nvm/nvm.sh"
-    # This loads nvm bash_completion
-    [[ -s "${HOMEBREW_PREFIX}/opt/nvm/etc/bash_completion.d/nvm" ]] && source "${HOMEBREW_PREFIX}/opt/nvm/etc/bash_completion.d/nvm"
-  else
-    echo "Missing nvm installation"
-  fi
-}
-export -f source_nvm_install
+export -f activate-conda-env
 
 # Set default editor
 EDITOR=nvim
@@ -203,7 +191,7 @@ if [[ -d ${_BASHRC_DIR}/../ext/itsapinhulk/shellutils/bash ]]; then
 fi
 
 # Single command to start all tmux sessions
-function tmux_start_server() {
+function tmux-start-server() {
     for _file in $(ls ${XDG_CONFIG_HOME}/tmuxp/); do
         local _session_name="${_file%.*}"
         # Load the session in the background
@@ -212,5 +200,5 @@ function tmux_start_server() {
 }
 
 # Simpler alias to load a tmux session
-alias tmux_attach="tmux attach-session -t"
-alias tmux_kill_server="tmux kill-server"
+alias tmux-attach="tmux attach-session -t"
+alias tmux-kill-server="tmux kill-server"
