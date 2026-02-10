@@ -1,8 +1,10 @@
 #!/bin/env bash
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
+_target_brewfile="${DOTFILES_BREWFILE:-$SCRIPT_DIR/Brewfile}"
+
 set -x
 brew update
 brew upgrade
-brew bundle --file="${SCRIPT_DIR}/Brewfile"
-brew bundle cleanup --force --file="${SCRIPT_DIR}/Brewfile"
+brew bundle --file="${_target_brewfile}"
+brew bundle cleanup --force --file="${_target_brewfile}"
