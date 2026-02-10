@@ -70,15 +70,17 @@ builtin_immutable_heads() | (trunk()..remote_bookmarks()) | (trunk().. & ~mine()
 "_add_log_context(x)" = "ancestors(present(x), 2)"
 # The following changes will be shown by default for the `log` command
 # 1. Tips of remote bookmarks
-# 2. All local bookmarks, the latest tag, the tip of trunk,
+# 2. All local bookmarks, the tip of trunk,
 #   commits by current author and working copy
-# For all the above we add one more commit for context.
+# 3. The latest tag, if it is within 2 weeks
 "default_log_()" = """
   tracked_remote_bookmarks() |
-  bookmarks()|latest(tags(), 1)|trunk()|@|
+  bookmarks()|trunk()|@|
+  (latest(tags(), 1) & committer_date(after:"14 days ago"))|
   (trunk()..my_heads())
 """
 
+# For all the above we add one more commit for context.
 "default_log()" = "_add_log_context(default_log_())"
 
 # Intended to show everything which might be relevant because it after the trunk change
