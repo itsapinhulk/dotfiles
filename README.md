@@ -73,7 +73,11 @@ Install any font in `fonts/` (using `./scripts/install_fonts.sh` on Linux)
 ### Homebrew
 
 1. Install homebrew for your platform
-2. Run `scripts/sync_homebrew.sh` to install and update
+2. Run `scripts/sync-brew` to install and update the set of brew packages
+3. You customize the Brewfile used by the above script by setting `DOTFILES_BREWFILE`
+4. To include this repo's Brewfile in your own, use the following snippet - 
+
+  `instance_eval(File.read("/path/to/itsapinhulk/dotfiles/scripts/Brewfile"))`
 
 ### ipython and Jupyter(lab)
 
