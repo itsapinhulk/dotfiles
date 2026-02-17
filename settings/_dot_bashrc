@@ -9,6 +9,15 @@ if [[ "$(uname)" == 'Darwin' ]]; then
     _IS_PLATFORM_MACOS="yes"
 fi
 
+function add-to-path() {
+    local dir="$1"
+    [[ -z "$dir" ]] && { echo "add-to-path: directory argument required" >&2; return 1; }
+    case ":$PATH:" in
+        *":$dir:"*) ;;  # already present
+        *) PATH="$dir:$PATH" ;;
+    esac
+}
+
 export XDG_CONFIG_HOME=$HOME/.config
 export XDG_CACHE_HOME=$HOME/.cache
 export XDG_DATA_HOME=$HOME/.local/share
@@ -42,7 +51,7 @@ umask u=rwx,g=rx,o=
 
 export TERM=xterm-256color
 
-export PATH=$PATH:/usr/local/bin
+add-to-path '/usr/local/bin'
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -189,11 +198,11 @@ bind '"\e[A": history-search-backward'
 bind '"\e[B": history-search-forward'
 
 if [[ -d ${_BASHRC_DIR}/../ext/itsapinhulk/shellutils/bash ]]; then
-  export PATH=$(realpath ${_BASHRC_DIR}/../ext/itsapinhulk/shellutils/bash):$PATH
+  add-to-path $(realpath ${_BASHRC_DIR}/../ext/itsapinhulk/shellutils/bash)
 fi
 
 if [[ -d ${_BASHRC_DIR}/../scripts ]]; then
-  export PATH=$(realpath ${_BASHRC_DIR}/../scripts):$PATH
+  add-to-path $(realpath ${_BASHRC_DIR}/../scripts)
 fi
 
 # Single command to start all tmux sessions
