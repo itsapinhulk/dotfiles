@@ -1,4 +1,13 @@
-# If not running interactively, don't do anything
+function add-to-path() {
+    local dir="$1"
+    [[ -z "$dir" ]] && { echo "add-to-path: directory argument required" >&2; return 1; }
+    case ":$PATH:" in
+        *":$dir:"*) ;;  # already present
+        *) PATH="$dir:$PATH" ;;
+    esac
+}
+
+# If not running interactively, don't do anything else
 case $- in
     *i*) ;;
       *) return;;
@@ -8,15 +17,6 @@ _IS_PLATFORM_MACOS="no"
 if [[ "$(uname)" == 'Darwin' ]]; then
     _IS_PLATFORM_MACOS="yes"
 fi
-
-function add-to-path() {
-    local dir="$1"
-    [[ -z "$dir" ]] && { echo "add-to-path: directory argument required" >&2; return 1; }
-    case ":$PATH:" in
-        *":$dir:"*) ;;  # already present
-        *) PATH="$dir:$PATH" ;;
-    esac
-}
 
 export XDG_CONFIG_HOME=$HOME/.config
 export XDG_CACHE_HOME=$HOME/.cache
