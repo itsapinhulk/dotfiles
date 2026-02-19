@@ -1,0 +1,2 @@
+[tool.uv]
+python-downloads = "manual"
