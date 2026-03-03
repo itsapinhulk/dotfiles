@@ -35,6 +35,7 @@ fi
 alias ll="ls -ltr"
 alias la="ls -altr"
 alias lh="ls -altrh"
+alias pg="ag --skip-vcs-ignores --hidden"
 
 if which --version &> /dev/null; then
     # only create alias for supported which variants
