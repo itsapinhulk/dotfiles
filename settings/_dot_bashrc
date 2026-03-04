@@ -202,6 +202,10 @@ if [[ -d ${_BASHRC_DIR}/../ext/itsapinhulk/shellutils/bash ]]; then
   add-to-path $(realpath ${_BASHRC_DIR}/../ext/itsapinhulk/shellutils/bash)
 fi
 
+if [[ -d ${_BASHRC_DIR}/../ext/itsapinhulk/shellutils/py ]]; then
+  add-to-path $(realpath ${_BASHRC_DIR}/../ext/itsapinhulk/shellutils/py)
+fi
+
 if [[ -d ${_BASHRC_DIR}/../scripts ]]; then
   add-to-path $(realpath ${_BASHRC_DIR}/../scripts)
 fi
