@@ -8,17 +8,17 @@
 #   GIT_SHA    – full commit SHA baked into the image
 #   BUILD_DATE – YYYYMMDD-hhmm for the image tag
 
-ARG USERNAME=devuser
-ARG REPO_URL=""
-ARG GIT_SHA="unknown"
-ARG BUILD_DATE="unknown"
 
 # ── base ──────────────────────────────────────────────────────────────────────
 FROM ubuntu:24.04
 
-ARG REPO_URL
-ARG GIT_SHA
-ARG BUILD_DATE
+ARG USERNAME=devuser
+ARG USER_UID=1111
+ARG USER_GID=$USER_UID
+
+ARG REPO_URL=""
+ARG GIT_SHA="unknown"
+ARG BUILD_DATE="unknown"
 
 # Labels follow OCI image-spec conventions
 LABEL org.opencontainers.image.revision="${GIT_SHA}" \
@@ -58,7 +58,7 @@ COPY . .
 # Stamp the exact commit so the image is self-describing at runtime.
 # Only performed when REPO_URL is provided; skipped for local/manual builds.
 RUN if [ -n "${REPO_URL}" ]; then git remote set-url origin "${REPO_URL}"; fi \
-    && echo "${GIT_SHA}" > /app/.git-sha \
-    && echo "${BUILD_DATE}" > /app/.build-date
+    && echo "${GIT_SHA}" > /dotfiles/.git-sha \
+    && echo "${BUILD_DATE}" > /dotfiles/.build-date
 
 # TODO: install dotfiles

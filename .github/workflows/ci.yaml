@@ -12,16 +12,16 @@ name: Continuous Integration and Deployment
 
 on:
   push:
-  workflow_dispatch:  # allows manual triggering
+  workflow_dispatch: # allows manual triggering
 
 jobs:
   build-and-push:
-    if: github.ref == 'refs/heads/main'  # Only push to Docker Hub from main branch
-    environment: docker   # Grants access to environment secrets
+    if: github.ref == 'refs/heads/main' # Only push to Docker Hub from main branch
+    environment: docker # Grants access to environment secrets
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write   # allows pushing to ghcr.io via GITHUB_TOKEN
+      packages: write # allows pushing to ghcr.io via GITHUB_TOKEN
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -41,14 +41,6 @@ jobs:
         with:
           username: itsapinhulk
           password: ${{ secrets.DOCKERHUB_ITSAPINHULK_TOKEN }}
-
-      - name: Build and push
-        uses: docker/build-push-action@v7
-        with:
-          context: .
-          push: true
-          tags: |
-            itsapinhulk/devcontainer:latest
 
       - name: Build and push
         env:
