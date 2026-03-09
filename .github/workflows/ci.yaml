@@ -43,4 +43,4 @@ jobs:
           password: ${{ secrets.DOCKERHUB_ITSAPINHULK_TOKEN }}
 
       - name: Build and push
-        run: ./ci-scripts/build-and-push.sh --skip-confirm
+        run: ./ci-scripts/build-and-push.sh --skip-confirm --push-images
