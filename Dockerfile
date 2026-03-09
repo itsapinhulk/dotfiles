@@ -42,7 +42,7 @@ RUN echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
 # Set bash as the default shell
-RUN chsh -s /usr/bin/bash devuser
+RUN chsh -s /usr/bin/bash ${USERNAME}
 
 # Set the default user for the image, also used in the rest of steps.
 USER $USERNAME
@@ -52,6 +52,7 @@ USER $USERNAME
 # .dockerignore should exclude build artefacts, secrets, etc.
 WORKDIR /dotfiles
 COPY . .
+RUN sudo chown -R ${USERNAME}:${USERNAME} /dotfiles
 
 # Rewrite the origin remote to the canonical https:// URL so that
 # `git pull` / `git fetch` works from inside a running container.
