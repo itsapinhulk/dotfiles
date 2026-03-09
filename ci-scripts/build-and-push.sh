@@ -20,8 +20,6 @@ Usage: $0 [--ghcr-path IMAGE] [--docker-hub-path IMAGE] [--skip-confirm] [-h]
 Build once and push to one or both registries. At least one path is required.
 Each registry receives two tags:  :latest  and  :YYYYMMDD-hhmm-<git-sha>
 
-Registries are skipped (with a warning) if the required token env var is not set
-
 Options:
   --ghcr-path         IMAGE   Image path on ghcr.io    (default: itsapinhulk/devcontainer)
   --docker-hub-path   IMAGE   Image path on Docker Hub  (default: itsapinhulk/devcontainer)
@@ -30,12 +28,13 @@ Options:
 
 Examples:
   $0 --ghcr-path myuser/devcontainer --docker-hub-path myorg/devcontainer
-  $0 --skip-confirm   # Push to default repos, without confirmation
+  $0 --skip-confirm --push-images  # Push to default repos, without confirmation
 EOF
 }
 
 # ── argument parsing ──────────────────────────────────────────────────────────
 SKIP_CONFIRM=false
+PUSH_IMAGES=false
 GHCR_ROOT="ghcr.io"
 GHCR_PATH="itsapinhulk/devcontainer"
 DOCKERHUB_ROOT="docker.io"
@@ -44,6 +43,7 @@ DOCKERHUB_PATH="itsapinhulk/devcontainer"
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --skip-confirm)       SKIP_CONFIRM=true ;;
+    --push-images)        PUSH_IMAGES=true ;;
     --ghcr-path)          GHCR_PATH="$2"; shift ;;
     --docker-hub-path)    DOCKERHUB_PATH="$2";  shift ;;
     -h|--help)            usage; exit 0 ;;
@@ -84,23 +84,18 @@ else
 fi
 info "Repo URL : $REPO_URL"
 
-# ── resolve tags and check tokens ─────────────────────────────────────────────
-# registry_check <label> <path> <token_var>
-# Populates BUILD_TAGS and PUSH_REGISTRIES; warns and skips on missing path/token.
+# ── resolve tags  ────────────────────────────────────────────────────────────────
+# registry_check <label> <path>
+# Populates BUILD_TAGS and PUSH_REGISTRIES; warns and skips on missing path.
 DATED_SUFFIX="${BUILD_DATE}-${GIT_SHA_SHORT}"
 BUILD_TAGS=()
 declare -A PUSH_REGISTRIES   # label → "dated_tag latest_tag"
 
 registry_check() {
-  local label="$1" path="$2" token_var="$3"
+  local label="$1" path="$2"
 
   if [[ -z "$path" ]]; then
     warn "$label path not provided — skipping."
-    return
-  fi
-
-  if [[ -z "${!token_var:-}" ]]; then
-    warn "\$$token_var not set — skipping push to $label."
     return
   fi
 
@@ -110,8 +105,8 @@ registry_check() {
   PUSH_REGISTRIES["$label"]="$dated $latest"
 }
 
-registry_check "ghcr.io"    "$GHCR_FULL_URL"        "GHCR_TOKEN"
-registry_check "Docker Hub" "$DOCKERHUB_FULL_URL"   "DOCKERHUB_TOKEN"
+registry_check "ghcr.io"    "$GHCR_FULL_URL"
+registry_check "Docker Hub" "$DOCKERHUB_FULL_URL"
 
 [[ ${#BUILD_TAGS[@]} -eq 0 ]] \
   && die "Nothing to build — all registries were skipped."
@@ -153,10 +148,12 @@ push_registry() {
   done
 }
 
-for label in "${!PUSH_REGISTRIES[@]}"; do
-  # shellcheck disable=SC2086
-  read -ra tags <<< "${PUSH_REGISTRIES[$label]}"
-  push_registry "$label" "${tags[@]}"
-done
+if [[ "$PUSH_IMAGES" == true ]]; then
+    for label in "${!PUSH_REGISTRIES[@]}"; do
+    # shellcheck disable=SC2086
+    read -ra tags <<< "${PUSH_REGISTRIES[$label]}"
+    push_registry "$label" "${tags[@]}"
+    done
+fi
 
 ok "Done."

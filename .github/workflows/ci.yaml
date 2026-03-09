@@ -43,6 +43,4 @@ jobs:
           password: ${{ secrets.DOCKERHUB_ITSAPINHULK_TOKEN }}
 
       - name: Build and push
-        env:
-          GHCR_USER: ${{ github.actor }}
         run: ./ci-scripts/build-and-push.sh --skip-confirm
