@@ -1,13 +1,14 @@
-# Devcontainer image which includes basic linux configuration and this dotfiles repo.
-FROM ubuntu:24.04
-
 # syntax=docker/dockerfile:1
 #
+# Devcontainer image which includes basic linux configuration and this dotfiles repo.
+#
 # Build args injected by build-and-push.sh:
+#   USERNAME   – username for the image and default user
 #   REPO_URL   – https:// URL of the origin remote
 #   GIT_SHA    – full commit SHA baked into the image
 #   BUILD_DATE – YYYYMMDD-hhmm for the image tag
 
+ARG USERNAME=devuser
 ARG REPO_URL=""
 ARG GIT_SHA="unknown"
 ARG BUILD_DATE="unknown"
@@ -27,9 +28,24 @@ LABEL org.opencontainers.image.revision="${GIT_SHA}" \
 # ── system deps ───────────────────────────────────────────────────────────────
 RUN apt-get update && \
         apt-get install -y --no-install-recommends \
-        git \
+        git git-lfs sudo \
         ca-certificates \
     && rm -rf /var/lib/apt/lists/*
+
+# ── user ───────────────────────────────────────────────────────────────────────
+# Create the user, and give it sudo permission. All in one step to avoid cluttering layers
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME
+
+# Allow sudo for the user
+RUN echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
+
+# Set bash as the default shell
+RUN chsh -s /usr/bin/bash devuser
+
+# Set the default user for the image, also used in the rest of steps.
+USER $USERNAME
 
 # ── copy repo ─────────────────────────────────────────────────────────────────
 # The build context is the repository root.
@@ -45,6 +61,4 @@ RUN if [ -n "${REPO_URL}" ]; then git remote set-url origin "${REPO_URL}"; fi \
     && echo "${GIT_SHA}" > /app/.git-sha \
     && echo "${BUILD_DATE}" > /app/.build-date
 
-# ── default command ───────────────────────────────────────────────────────────
-# Override in `docker run` or a child image.
-CMD ["bash"]
+# TODO: install dotfiles

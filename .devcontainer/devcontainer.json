@@ -1,0 +1,18 @@
+{
+  "name": "Dotfiles Dev Environment",
+  "build": {
+    "dockerfile": "Dockerfile",
+  },
+  "workspaceFolder": "/repo/dotfiles",
+  "remoteUser": "devuser",
+  "containerUser": "devuser",
+  // Ensures the container workspace folder is owned by your user
+  "updateRemoteUserUID": true,
+  "mounts": [
+    "source=claude-code-config,target=/home/devuser/.claude,type=volume",
+  ],
+  "containerEnv": {
+    "CLAUDE_CONFIG_DIR": "/home/devuser/.claude",
+  },
+  "postStartCommand": ["sudo chown -R devuser:devuser /repo"],
+}
