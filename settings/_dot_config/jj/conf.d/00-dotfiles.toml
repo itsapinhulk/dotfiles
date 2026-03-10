@@ -54,6 +54,18 @@ separate(" ",
 )
 """
 
+# Commit message draft crediting claude as the co-author
+# Add the following to a follow-on config to enable it
+# [templates]
+# draft_commit_description = 'claude_draft()'
+'claude_draft()' = '''
+separate("\n",
+  description,
+  "\n\nCo-authored-by: Claude <claude@anthropic.com>",
+  surround("JJ: Changes:\n", "", indent("JJ: \t", diff.summary()))
+)
+'''
+
 [revset-aliases]
 # Customize the set of immutable_heads,, in addition to built-in ones
 # Any changes NOT made by current user are immutable
