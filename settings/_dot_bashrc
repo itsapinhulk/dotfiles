@@ -52,7 +52,8 @@ umask u=rwx,g=rx,o=
 
 export TERM=xterm-256color
 
-add-to-path '/usr/local/bin'
+add-to-path /usr/local/bin
+add-to-path ~/.local/bin
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
