@@ -1,5 +1,6 @@
 {
   "name": "Dotfiles Dev Environment",
+  "runArgs": ["--name", "devct-dotfiles"],
   "build": {
     "dockerfile": "Dockerfile",
   },
@@ -10,6 +11,7 @@
   "updateRemoteUserUID": true,
   "mounts": [
     "source=claude-code-config,target=/home/devuser/.claude,type=volume",
+     "type=volume,target=${containerWorkspaceFolder}/.jj",
   ],
   "containerEnv": {
     "CLAUDE_CONFIG_DIR": "/home/devuser/.claude",

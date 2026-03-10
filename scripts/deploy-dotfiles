@@ -1,0 +1,568 @@
+#!/usr/bin/env python3
+"""
+deploy_dotfiles.py — Deploy dotfiles repos to a target home directory.
+
+Conventions
+-----------
+* The repo's ``settings/`` directory is treated as the home directory root.
+* Files/dirs whose names begin with ``_dot_`` map to hidden names starting
+  with ``.`` (e.g. ``_dot_bashrc`` → ``.bashrc``).
+* The default action is to create a symlink at the target path.
+* A small internal table (SPECIAL_HANDLERS) controls per-subpath overrides
+  (e.g. gitconfig uses an *include* directive instead of a plain symlink).
+* Target paths are OS-specific; the repo layout follows Linux conventions.
+
+Usage
+-----
+    python deploy_dotfiles.py [options] repo1 [repo2 ...]
+
+    -t, --target DIR      Override home directory (default: $HOME)
+    -b, --backup DIR      Backup directory          (default: ~/.backup)
+    -v, --verbose         Print every decision
+    --apply               Actually apply changes (default is a dry-run)
+    --skip PATH           Skip a translated target path (repeat for multiple)
+                          Also read from DEPLOY_DOTFILES_SKIP env var
+                          (colon-separated on POSIX, semicolon-separated on Windows)
+"""
+
+from __future__ import annotations
+
+import argparse
+import datetime
+import os
+import platform
+import secrets
+import shutil
+import sys
+import textwrap
+from pathlib import Path
+from typing import Callable, NamedTuple
+
+# ---------------------------------------------------------------------------
+# OS helpers
+# ---------------------------------------------------------------------------
+
+OS = platform.system()   # 'Linux', 'Darwin', 'Windows'
+
+
+def _appdata() -> Path:
+    return Path(os.environ.get("APPDATA", Path.home() / "AppData" / "Roaming"))
+
+
+def _local_appdata() -> Path:
+    return Path(os.environ.get("LOCALAPPDATA", Path.home() / "AppData" / "Local"))
+
+
+# ---------------------------------------------------------------------------
+# Name translation
+# ---------------------------------------------------------------------------
+
+_DOT_PREFIX = "_dot_"
+
+
+def repo_name_to_target_name(name: str) -> str:
+    """Convert a repo filename to its deployed name.
+
+    ``_dot_bashrc``        → ``.bashrc``
+    ``_dot_config``        → ``.config``
+    ``_dot_neoconf.json``  → ``.neoconf.json``
+    Any other name is returned unchanged.
+    """
+    if name.startswith(_DOT_PREFIX):
+        return "." + name[len(_DOT_PREFIX):]
+    return name
+
+
+def subpath_to_target(subpath: Path) -> Path:
+    """Translate every path component of *subpath* using repo_name_to_target_name."""
+    return Path(*[repo_name_to_target_name(part) for part in subpath.parts])
+
+
+# ---------------------------------------------------------------------------
+# OS path mapping
+# ---------------------------------------------------------------------------
+
+# Some tools store their config in different locations per OS.
+# Keys are *translated* target subpaths (Linux/POSIX conventions).
+# Values are callables (root: Path) → Path.
+OS_PATH_MAP: dict[str, Callable[[Path], Path]] = {
+    ".config/nvim": lambda root: (
+        _local_appdata() / "nvim" if OS == "Windows" else root / ".config" / "nvim"
+    ),
+    ".config/jj": lambda root: (
+        _appdata() / "jj" if OS == "Windows" else root / ".config" / "jj"
+    ),
+    ".config/conda": lambda root: (
+        _appdata() / "conda" if OS == "Windows" else root / ".config" / "conda"
+    ),
+}
+
+
+def resolve_target_path(root: Path, subpath: Path) -> Path:
+    """Return the OS-correct absolute path for *subpath* under *root*."""
+    translated = subpath_to_target(subpath)
+    key = translated.as_posix()
+    if key in OS_PATH_MAP:
+        return OS_PATH_MAP[key](root)
+    return root / translated
+
+
+# ---------------------------------------------------------------------------
+# Handler infrastructure
+# ---------------------------------------------------------------------------
+
+class HandlerResult(NamedTuple):
+    changed: bool       # True  → a change is required
+    description: str    # human-readable explanation
+
+
+# A check function returns HandlerResult; an apply function makes the change.
+CheckFn = Callable[["DeployContext", Path, Path], HandlerResult]
+ApplyFn = Callable[["DeployContext", Path, Path], None]
+
+
+class SpecialHandler(NamedTuple):
+    check: CheckFn
+    apply: ApplyFn
+
+
+# ---------------------------------------------------------------------------
+# Default symlink handler
+# ---------------------------------------------------------------------------
+
+def _check_symlink(ctx: "DeployContext", src: Path, dst: Path) -> HandlerResult:
+    if dst.is_symlink():
+        existing = Path(os.readlink(dst))
+        # Resolve both sides so drive-letter casing and relative vs absolute
+        # paths compare correctly on Windows as well as POSIX.
+        if existing.resolve() == src.resolve():
+            return HandlerResult(False, f"symlink already correct: {dst} → {src}")
+        return HandlerResult(True, f"replace symlink {dst} (→ {existing}) with → {src}")
+    if dst.exists():
+        return HandlerResult(True, f"replace existing path {dst} with symlink → {src}")
+    return HandlerResult(True, f"create symlink {dst} → {src}")
+
+
+def _apply_symlink(ctx: "DeployContext", src: Path, dst: Path) -> None:
+    if dst.is_symlink() or dst.exists():
+        if dst.is_symlink():
+            dst.unlink()
+        elif dst.is_dir():
+            shutil.rmtree(dst)
+        else:
+            dst.unlink()
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    # target_is_directory is ignored on POSIX but required on Windows
+    # when symlinking to a directory (otherwise the link acts as a file symlink).
+    os.symlink(src, dst, target_is_directory=src.is_dir())
+
+
+# ---------------------------------------------------------------------------
+# Special handler: .gitconfig — prepend [include] directive
+# ---------------------------------------------------------------------------
+
+_GITCONFIG_COMMENT = (
+    "# dotfiles [include] is placed first so that settings in this file\n"
+    "# can override anything set in the included dotfiles config.\n"
+)
+
+def _check_gitconfig_include(ctx: "DeployContext", src: Path, dst: Path) -> HandlerResult:
+    """
+    Git natively supports [include] / [includeIf] directives, so instead of
+    symlinking ~/.gitconfig we ensure it contains:
+
+        [include]
+            path = /abs/path/to/_dot_gitconfig
+
+    The include block is placed after any leading comment lines so that
+    settings added below it in ~/.gitconfig can override the dotfiles config.
+    """
+    include_line = f"\tpath = {src}"
+    if dst.exists() and not dst.is_symlink():
+        text = dst.read_text(errors="replace")
+        if include_line in text:
+            return HandlerResult(False, f".gitconfig already includes {src}")
+        return HandlerResult(True, f"prepend [include] path={src} to {dst}")
+    if not dst.exists():
+        return HandlerResult(True, f"create {dst} with [include] path={src}")
+    # dst is currently a symlink
+    return HandlerResult(True, f"replace symlink {dst} with real .gitconfig including {src}")
+
+
+def _apply_gitconfig_include(ctx: "DeployContext", src: Path, dst: Path) -> None:
+    include_line = f"\tpath = {src}"
+    include_block = f"{_GITCONFIG_COMMENT}[include]\n{include_line}\n"
+
+    if dst.is_symlink():
+        dst.unlink()
+
+    dst.parent.mkdir(parents=True, exist_ok=True)
+
+    if not dst.exists():
+        dst.write_text(include_block)
+        return
+
+    # Insert after any contiguous leading comment lines, before the first
+    # non-comment/non-blank line, so user settings that follow can override.
+    lines = dst.read_text(errors="replace").splitlines(keepends=True)
+    insert_at = 0
+    for i, line in enumerate(lines):
+        if line.startswith("#") or line.strip() == "":
+            insert_at = i + 1
+        else:
+            break
+    new_lines = lines[:insert_at] + ["\n" + include_block + "\n"] + lines[insert_at:]
+    dst.write_text("".join(new_lines))
+
+
+# ---------------------------------------------------------------------------
+# Special handler: .config/conda/condarc — symlink file + create ~/.condarc alias
+# ---------------------------------------------------------------------------
+
+def _check_conda_condarc(ctx: "DeployContext", src: Path, dst: Path) -> HandlerResult:
+    """
+    Symlink .config/conda/condarc from the repo as usual, then also create:
+
+        ~/.condarc  →  ~/.config/conda/condarc
+
+    so both conda lookup paths resolve to the same file.
+    """
+    file_result = _check_symlink(ctx, src, dst)
+    alias_dst = ctx.target_root / ".condarc"
+    alias_result = _check_symlink(ctx, dst, alias_dst)
+    changed = file_result.changed or alias_result.changed
+    desc_parts = [r.description for r in (file_result, alias_result) if r.changed]
+    return HandlerResult(changed, "; ".join(desc_parts) if desc_parts else file_result.description)
+
+
+def _apply_conda_condarc(ctx: "DeployContext", src: Path, dst: Path) -> None:
+    ctx.maybe_apply(src, dst, _check_symlink, _apply_symlink, "link")
+    alias_dst = ctx.target_root / ".condarc"
+    ctx.maybe_apply(dst, alias_dst, _check_symlink, _apply_symlink, "link")
+
+
+# ---------------------------------------------------------------------------
+# Special handler registry and whole-dir symlink list
+# ---------------------------------------------------------------------------
+
+# Keys are *translated* subpaths relative to target root (POSIX strings).
+SPECIAL_HANDLERS: dict[str, SpecialHandler] = {
+    ".gitconfig":          SpecialHandler(_check_gitconfig_include, _apply_gitconfig_include),
+    ".config/conda/condarc": SpecialHandler(_check_conda_condarc, _apply_conda_condarc),
+}
+
+# Width of the bracketed label column in log output, e.g. "[priority-skip]" = 15.
+_LABEL_WIDTH = 16
+
+# These directories are symlinked as a whole rather than recursed into.
+# Keys are *translated* subpaths (POSIX).
+SYMLINK_WHOLE_DIRS: set[str] = {
+    ".config/nvim/lua",
+}
+
+
+# ---------------------------------------------------------------------------
+# Backup helper
+# ---------------------------------------------------------------------------
+
+def make_backup(path: Path, dest_dir: Path, dry_run: bool) -> None:
+    """Copy *path* into *dest_dir* (caller is responsible for the directory name).
+
+    On Windows, where file-copy semantics for symlinks are unreliable, a small
+    text file ``<name>.txt`` is written instead, recording the absolute path of
+    the original so the user can recover it manually if needed.
+    """
+    if not path.exists() and not path.is_symlink():
+        return
+    if OS == "Windows":
+        pointer = dest_dir / (path.name + ".txt")
+        if not dry_run:
+            dest_dir.mkdir(parents=True, exist_ok=True)
+            pointer.write_text(str(path.resolve()), encoding="utf-8")
+            print(f"  {'[backup]':<{_LABEL_WIDTH}} {path}  →  {pointer}  (pointer)")
+    else:
+        dest = dest_dir / path.name
+        if not dry_run:
+            dest_dir.mkdir(parents=True, exist_ok=True)
+            if path.is_symlink() or path.is_file():
+                try:
+                    shutil.copy2(path, dest, follow_symlinks=False)
+                except (NotImplementedError, TypeError):
+                    shutil.copy2(path, dest)
+            else:
+                shutil.copytree(path, dest)
+            print(f"  {'[backup]':<{_LABEL_WIDTH}} {path}  →  {dest}")
+
+
+# ---------------------------------------------------------------------------
+# Deploy context
+# ---------------------------------------------------------------------------
+
+class DeployContext:
+    """Immutable-ish bundle of options shared across all deploy operations."""
+
+    def __init__(
+        self,
+        target_root: Path,
+        backup_root: Path | None,
+        dry_run: bool,
+        verbose: bool,
+        skip_paths: frozenset[str] = frozenset(),
+    ) -> None:
+        self.target_root = target_root
+        self.backup_root = backup_root
+        self.dry_run = dry_run
+        self.verbose = verbose
+        self.skip_paths = skip_paths  # translated POSIX subpaths to skip
+        # Path is computed eagerly so it can be displayed up front; the
+        # directory itself is created lazily (only when a backup is needed).
+        if backup_root is not None:
+            timestamp = (
+                datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                + "_" + secrets.token_hex(4)
+            )
+            self.run_backup_dir: Path | None = backup_root / timestamp
+        else:
+            self.run_backup_dir = None
+
+    def _get_run_backup_dir(self) -> Path:
+        """Return the per-run timestamped backup directory, creating it on first use."""
+        assert self.run_backup_dir is not None
+        return self.run_backup_dir
+
+    # ------------------------------------------------------------------
+    # Public helpers used by handlers and deployment functions
+
+    def backup(self, path: Path) -> None:
+        """Back up *path* into this run's shared timestamped directory."""
+        if self.run_backup_dir is None:
+            return
+        make_backup(path, self._get_run_backup_dir(), self.dry_run)
+
+    def log(self, msg: str) -> None:
+        if self.verbose:
+            print(msg)
+
+    def maybe_apply(
+        self,
+        src: Path,
+        dst: Path,
+        check_fn: CheckFn,
+        apply_fn: ApplyFn,
+        label: str,
+    ) -> None:
+        """
+        Check whether a change is needed; if so, back up the destination
+        first then apply the change.  This is the central safe-apply gate
+        that ensures we never lose data.
+        """
+        result = check_fn(self, src, dst)
+        if result.changed:
+            print(f"  {f'[{label}]':<{_LABEL_WIDTH}} {result.description}")
+            if not self.dry_run:
+                self.backup(dst)
+                apply_fn(self, src, dst)
+        else:
+            self.log(f"  {'[skip]':<{_LABEL_WIDTH}} {result.description}")
+
+
+# ---------------------------------------------------------------------------
+# Core deployment logic
+# ---------------------------------------------------------------------------
+
+def settings_root(repo: Path) -> Path:
+    """Return the ``settings/`` subdirectory if it exists, otherwise the repo root."""
+    candidate = repo / "settings"
+    return candidate if candidate.is_dir() else repo
+
+
+def deploy_entry(ctx: DeployContext, src: Path, subpath: Path) -> None:
+    """
+    Deploy a single file or directory rooted at *subpath* relative to the
+    settings directory.  Directories are recursed unless they appear in
+    SYMLINK_WHOLE_DIRS or SPECIAL_HANDLERS.
+    """
+    dst = resolve_target_path(ctx.target_root, subpath)
+    translated_key = subpath_to_target(subpath).as_posix()
+
+    # 0. Skip list takes priority over everything.
+    if translated_key in ctx.skip_paths:
+        ctx.log(f"  {'[skip]':<{_LABEL_WIDTH}} {translated_key} (in skip list)")
+        return
+
+    # 1. Special handler takes full precedence.
+    if translated_key in SPECIAL_HANDLERS:
+        handler = SPECIAL_HANDLERS[translated_key]
+        ctx.maybe_apply(src, dst, handler.check, handler.apply, "special")
+        return
+
+    # 2. Directories: recurse unless the whole dir should be symlinked.
+    if src.is_dir() and translated_key not in SYMLINK_WHOLE_DIRS:
+        for child in sorted(src.iterdir()):
+            deploy_entry(ctx, child, subpath / child.name)
+        return
+
+    # 3. Default: symlink.
+    ctx.maybe_apply(src, dst, _check_symlink, _apply_symlink, "link")
+
+
+def deploy_repo(ctx: DeployContext, repo: Path) -> None:
+    """Deploy every top-level entry from one repo's settings directory."""
+    root = settings_root(repo)
+    if not root.is_dir():
+        print(f"{'[warn]':<{_LABEL_WIDTH}} settings dir not found in {repo}, skipping.", file=sys.stderr)
+        return
+    ctx.log(f"{'[repo]':<{_LABEL_WIDTH}} {repo}  (settings root: {root})")
+    for child in sorted(root.iterdir()):
+        deploy_entry(ctx, child, Path(child.name))
+
+
+def _collect_leaf_subpaths(root: Path) -> list[Path]:
+    """
+    Walk the settings directory and return leaf subpaths — the paths that
+    will actually be deployed (files, whole-dir symlinks, and special paths).
+    """
+    results: list[Path] = []
+
+    def _walk(src: Path, prefix: Path) -> None:
+        for child in sorted(src.iterdir()):
+            rel = prefix / child.name
+            translated_key = subpath_to_target(rel).as_posix()
+            # Stop recursing if the whole dir or a special handler applies.
+            is_leaf = (
+                child.is_file()
+                or translated_key in SYMLINK_WHOLE_DIRS
+                or translated_key in SPECIAL_HANDLERS
+            )
+            if is_leaf:
+                results.append(rel)
+            elif child.is_dir():
+                _walk(child, rel)
+
+    _walk(root, Path())
+    return results
+
+
+def deploy_repos_with_priority(ctx: DeployContext, repos: list[Path]) -> None:
+    """
+    Deploy multiple repos with first-wins priority: for each unique target
+    subpath, only the first repo that provides it is used; subsequent repos
+    fill in entries that are not yet covered.
+    """
+    seen: set[str] = set()
+
+    for repo in repos:
+        root = settings_root(repo)
+        if not root.is_dir():
+            print(f"{'[warn]':<{_LABEL_WIDTH}} settings dir not found in {repo}, skipping.", file=sys.stderr)
+            continue
+        ctx.log(f"{'[repo]':<{_LABEL_WIDTH}} {repo}  (settings root: {root})")
+
+        for subpath in _collect_leaf_subpaths(root):
+            key = subpath_to_target(subpath).as_posix()
+            if key in seen:
+                ctx.log(f"  {'[priority-skip]':<{_LABEL_WIDTH}} {key} already provided by an earlier repo")
+                continue
+            seen.add(key)
+            deploy_entry(ctx, root / subpath, subpath)
+
+
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
+
+def build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        description=textwrap.dedent("""\
+            Deploy dotfiles repos to a target home directory.
+
+            Repos are applied in priority order: the first repo to provide a
+            given file wins; later repos only fill in uncovered entries.
+        """),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    p.add_argument(
+        "repos", nargs="*", metavar="REPO",
+        help="Path(s) to dotfiles repo(s), in priority order",
+    )
+    p.add_argument(
+        "-t", "--target", metavar="DIR", default=None,
+        help="Override target home directory (default: $HOME)",
+    )
+    p.add_argument(
+        "-b", "--backup", metavar="DIR", default=None,
+        help="Backup directory (default: ~/.backup)",
+    )
+
+    p.add_argument(
+        "-v", "--verbose", action="store_true",
+        help="Print every decision (skip and change alike)",
+    )
+    p.add_argument(
+        "--apply", action="store_true",
+        help="Actually apply changes (default is a dry-run that shows what would happen)",
+    )
+    p.add_argument(
+        "--skip", metavar="PATH", action="append", default=[],
+        help=(
+            "Translated target subpath to skip (e.g. .bashrc, .config/nvim). "
+            "Repeat to skip multiple paths. "
+            "Also read from DEPLOY_DOTFILES_SKIP (colon-separated on POSIX, "
+            "semicolon-separated on Windows)."
+        ),
+    )
+    return p
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+
+    if not args.repos:
+        parser.print_help()
+        return 1
+
+    target_root = Path(args.target).expanduser() if args.target else Path.home()
+
+    if args.backup:
+        backup_root = Path(args.backup).expanduser()
+    else:
+        backup_root = Path.home() / ".backup"
+
+    dry_run = not args.apply
+    if dry_run:
+        print(f"{'[dry-run]':<{_LABEL_WIDTH}} No changes will be made. Pass --apply to apply.\n")
+
+    # Merge --skip args with DEPLOY_DOTFILES_SKIP env var.
+    # The env var uses ':' as separator on POSIX and ';' on Windows.
+    env_sep = ";" if OS == "Windows" else ":"
+    env_skip = os.environ.get("DEPLOY_DOTFILES_SKIP", "")
+    env_skip_paths = [p.strip() for p in env_skip.split(env_sep) if p.strip()]
+    skip_paths = frozenset(args.skip + env_skip_paths)
+
+    ctx = DeployContext(
+        target_root=target_root,
+        backup_root=backup_root,
+        dry_run=dry_run,
+        verbose=args.verbose or dry_run,
+        skip_paths=skip_paths,
+    )
+    if ctx.run_backup_dir is not None:
+        print(f"{'[backup-dir]':<{_LABEL_WIDTH}} {ctx.run_backup_dir}")
+
+    repos = [Path(r).expanduser().resolve() for r in args.repos]
+    for repo in repos:
+        if not repo.is_dir():
+            print(f"{'[error]':<{_LABEL_WIDTH}} Repo not found: {repo}", file=sys.stderr)
+            return 1
+
+    if len(repos) == 1:
+        deploy_repo(ctx, repos[0])
+    else:
+        deploy_repos_with_priority(ctx, repos)
+
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
