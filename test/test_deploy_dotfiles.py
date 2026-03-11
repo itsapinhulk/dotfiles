@@ -18,6 +18,7 @@ from __future__ import annotations
 import importlib.machinery
 import importlib.util
 import io
+import platform
 import shutil
 import sys
 import tempfile
@@ -206,7 +207,12 @@ class TestMakeBackup(unittest.TestCase):
         src = self.tmp / "file.txt"
         src.write_text("content")
         make_backup(src, self.dest, dry_run=False)
-        self.assertEqual((self.dest / "file.txt").read_text(), "content")
+        if platform.system() == "Windows":
+            # Windows writes a pointer .txt file instead of copying
+            pointer = (self.dest / "file.txt.txt").read_text()
+            self.assertEqual(Path(pointer).resolve(), src.resolve())
+        else:
+            self.assertEqual((self.dest / "file.txt").read_text(), "content")
         self.assertTrue(src.exists())  # original untouched
 
     def test_backup_directory(self):
@@ -215,8 +221,13 @@ class TestMakeBackup(unittest.TestCase):
         src.mkdir()
         (src / "file.txt").write_text("content")
         make_backup(src, self.dest, dry_run=False)
-        self.assertTrue((self.dest / "mydir").is_dir())
-        self.assertEqual((self.dest / "mydir" / "file.txt").read_text(), "content")
+        if platform.system() == "Windows":
+            # Windows writes a pointer .txt file instead of copying
+            pointer = (self.dest / "mydir.txt").read_text()
+            self.assertEqual(Path(pointer).resolve(), src.resolve())
+        else:
+            self.assertTrue((self.dest / "mydir").is_dir())
+            self.assertEqual((self.dest / "mydir" / "file.txt").read_text(), "content")
 
     def test_backup_nonexistent_is_noop(self):
         """Backing up a nonexistent path does nothing (no error)."""
@@ -447,7 +458,11 @@ class TestIntegration(unittest.TestCase):
         self.assertTrue((self.home / ".bashrc").is_symlink())
         self.assertEqual((self.home / ".bashrc").read_text(), "new config")
         self.assertEqual(ctx.run_backup_dir.parent, backup_root)
-        self.assertEqual((ctx.run_backup_dir / ".bashrc").read_text(), "old config")
+        if platform.system() == "Windows":
+            pointer = (ctx.run_backup_dir / ".bashrc.txt").read_text()
+            self.assertEqual(Path(pointer).resolve(), (self.home / ".bashrc").resolve())
+        else:
+            self.assertEqual((ctx.run_backup_dir / ".bashrc").read_text(), "old config")
 
 
 # ---------------------------------------------------------------------------

@@ -8,14 +8,34 @@
 #   GHCR_TOKEN (or GITHUB_TOKEN)  – GitHub PAT with write:packages scope
 #   DOCKERHUB_ITSAPINHULK_TOKEN   – Docker Hub access token for itsapinhulk
 
-name: Continuous Integration and Deployment
+name: CI/CD
 
 on:
   push:
   workflow_dispatch: # allows manual triggering
 
 jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          allow-prereleases: true
+
+      - name: Run tests
+        run: python test/test_deploy_dotfiles.py -v
+
   build-and-push:
+    needs: test
     if: github.ref == 'refs/heads/main' # Only push to Docker Hub from main branch
     environment: docker # Grants access to environment secrets
     runs-on: ubuntu-latest
