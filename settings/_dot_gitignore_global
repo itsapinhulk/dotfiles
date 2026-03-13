@@ -7,3 +7,7 @@
 *.pyc
 
 compile_commands.json
+
+# For MacOS
+.DS_Store
+**/.DS_Store
