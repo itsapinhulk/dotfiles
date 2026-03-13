@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 #
-# Devcontainer image which includes basic linux configuration and this dotfiles repo.
+# Devcontainer image which includes basic linux tools and configuration from this dotfiles repo.
 #
 # Build args injected by build-and-push.sh:
 #   USERNAME   – username for the image and default user
@@ -66,25 +66,15 @@ LABEL org.opencontainers.image.revision="${GIT_SHA}" \
 # ── system deps ───────────────────────────────────────────────────────────────
 RUN apt-get update && \
         apt-get install -y --no-install-recommends \
-        git git-lfs sudo \
+        build-essential \
         ca-certificates \
         curl \
+        file \
+        git git-lfs \
+        procps \
         python3 \
-        ripgrep \
-        fzf \
-        fd-find \
-        cmake \
-        lua5.1 \
-        luarocks \
-        gcc \
-    && rm -rf /var/lib/apt/lists/* \
-    && ln -s /usr/bin/fdfind /usr/local/bin/fd
-
-# ── neovim (stable release) ───────────────────────────────────────────────────
-RUN ARCH="$(uname -m)" \
-    && curl -fsSL "https://github.com/neovim/neovim/releases/download/stable/nvim-linux-${ARCH}.tar.gz" \
-       | tar -xz -C /opt \
-    && ln -s "/opt/nvim-linux-${ARCH}/bin/nvim" /usr/local/bin/nvim
+        sudo \
+    && rm -rf /var/lib/apt/lists/*
 
 # ── user ───────────────────────────────────────────────────────────────────────
 # Create the user, and give it sudo permission. All in one step to avoid cluttering layers
@@ -95,9 +85,10 @@ RUN groupadd --gid $USER_GID $USERNAME \
 RUN echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
-# Set bash as the default shell
+# Set bash as the default shell (updated to brew bash after sync-brew)
 RUN chsh -s /usr/bin/bash ${USERNAME}
 ENV SHELL=/usr/bin/bash
+ENV BREW_BASH=/home/linuxbrew/.linuxbrew/bin/bash
 
 # Set the default user for the image, also used in the rest of steps.
 USER $USERNAME
@@ -109,8 +100,21 @@ COPY --from=builder /dotfiles .
 RUN sudo chown -R ${USERNAME}:${USERNAME} /dotfiles \
     && echo "${BUILD_DATE}" > /dotfiles/.build-date
 
+# ── homebrew ──────────────────────────────────────────────────────────────────
+RUN NONINTERACTIVE=1 /bin/bash -c \
+    "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+ENV PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:${PATH}"
+
 # ── install dotfiles ──────────────────────────────────────────────────────────
 RUN python3 /dotfiles/scripts/deploy-dotfiles /dotfiles --apply
+
+# ── sync brew packages ────────────────────────────────────────────────────────
+RUN /dotfiles/scripts/sync-brew
+
+# ── switch default shell to brew bash ─────────────────────────────────────────
+RUN echo "${BREW_BASH}" | sudo tee -a /etc/shells \
+    && sudo chsh -s "${BREW_BASH}" ${USERNAME}
+ENV SHELL=${BREW_BASH}
 
 WORKDIR /home/${USERNAME}
 

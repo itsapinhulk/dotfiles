@@ -1,6 +1,9 @@
 # Dot Files
 
-Repository of personal dot/setting files and environment setup
+Repository of personal dot/setting files and environment setup.
+There is also a Dockerfile which includes basic linux tools and configuration from this repo.
+The built images are available on Docker Hub (https://hub.docker.com/r/itsapinhulk/devcontainer) and
+GitHub Packages (https://ghcr.io/itsapinhulk/devcontainer).
 
 ## Automated Setup
 The repo comes with a script to deploy all the settings and keep any further changes in sync. It will
@@ -16,29 +19,6 @@ The repo also includes a `sync-dotfiles` script which calls the above, and can b
 setting `DOTFILES_SYNC_REPOS` and `DOTFILES_SYNC_SKIP`.
 
 ## Manual Setup
-### NeoVim
-
-1. Install `ripgrep`, `fzf`, `fd`, `cmake`, `lua(5.1)` and `luarocks(3+)`
-
-2. Either copy the contents of (for further customization) or link to `init.lua` (deploy script can handle this)
-
-    ```
-    settings/_dot_config/nvim/init.lua      -> ~/.config/nvim/init.lua
-    ```
-
-3. Create a soft link for the default set of configs (deploy script can handle this).
-
-    ```
-    settings/_dot_config/nvim/lua                   -> ~/.config/nvim/lua
-    settings/_dot_config/nvim/_dot_neoconf.json     -> ~/.config/nvim/.neoconf.json
-    ```
-
-    or
-
-    ```
-    settings/_dot_config/nvim/lua/config      -> ~/.config/nvim/lua/config
-    settings/_dot_config/nvim/lua/plugins     -> ~/.config/nvim/lua/plugins
-    ```
 
 ### Fonts
 Install any font in `fonts/` (using `./scripts/install-dotfiles-font` on Linux)
