@@ -11,14 +11,19 @@
         "bindings": {
             "ctrl-shift-k": "agent::ToggleFocus",
             "ctrl-?": null,
-        }
+        },
+    },
+    {
+        "bindings": {
+            "ctrl-shift-l": ["agent::NewExternalAgentThread", { "agent": { "custom": { "name": "claude-acp" } } }],
+        },
     },
     {
         "context": "Pane",
         "bindings": {
             "ctrl-shift-tab": "pane::ActivatePreviousItem",
             "ctrl-tab": "pane::ActivateNextItem",
-        }
+        },
     },
     {
         "context": "Editor && !menu",
@@ -31,14 +36,14 @@
             "ctrl-s": "workspace::Save", // vim default: show signature
             "ctrl-a": "editor::SelectAll", // vim default: increment
             "ctrl-w": "pane::CloseActiveItem", // vim default: ??
-        }
+        },
     },
     {
         "context": "Editor && (vim_mode==visual) && !VimWaiting && !VimObject",
         "bindings": {
             "p": ["vim::Paste", { "preserve_clipboard": true }],
             "shift-p": ["vim::Paste", { "preserve_clipboard": true }],
-        }
+        },
     },
     {
         "context": "Editor && vim_mode == insert && mode == full",
@@ -48,33 +53,33 @@
             "shift-enter": "editor::AcceptEditPrediction",
             "ctrl-enter": "editor::AcceptNextWordEditPrediction",
             "ctrl-k": "assistant::InlineAssist",
-        }
+        },
     },
     {
         "context": "Editor && edit_prediction",
         "bindings": {
             "shift-enter": "editor::AcceptEditPrediction",
             "ctrl-enter": "editor::AcceptNextWordEditPrediction",
-        }
+        },
     },
     {
         "context": "Editor && edit_prediction_conflict",
         "bindings": {
             "shift-enter": "editor::AcceptEditPrediction",
             "ctrl-enter": "editor::AcceptNextWordEditPrediction",
-        }
+        },
     },
     {
         "context": "!ContextEditor > Editor && mode == full",
         "bindings": {
             "ctrl-enter": "editor::AcceptNextWordEditPrediction",
             "ctrl-k": "assistant::InlineAssist",
-        }
+        },
     },
     {
         "context": "Editor && showing_completions",
         "bindings": {
             "enter": "editor::ConfirmCompletion",
-        }
-    }
+        },
+    },
 ]
