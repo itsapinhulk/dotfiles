@@ -21,8 +21,6 @@ Usage
     -v, --verbose         Print every decision
     --apply               Actually apply changes (default is a dry-run)
     --skip PATH           Skip a translated target path (repeat for multiple)
-                          Also read from DEPLOY_DOTFILES_SKIP env var
-                          (colon-separated on POSIX, semicolon-separated on Windows)
 """
 
 from __future__ import annotations
@@ -556,9 +554,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--skip", metavar="PATH", action="append", default=[],
         help=(
             "Translated target subpath to skip (e.g. .bashrc, .config/nvim). "
-            "Repeat to skip multiple paths. "
-            "Also read from DEPLOY_DOTFILES_SKIP (colon-separated on POSIX, "
-            "semicolon-separated on Windows)."
+            "Repeat to skip multiple paths."
         ),
     )
     return p
@@ -583,12 +579,7 @@ def main(argv: list[str] | None = None) -> int:
     if dry_run:
         print(f"{'[dry-run]':<{_LABEL_WIDTH}} No changes will be made. Pass --apply to apply.\n")
 
-    # Merge --skip args with DEPLOY_DOTFILES_SKIP env var.
-    # The env var uses ':' as separator on POSIX and ';' on Windows.
-    env_sep = ";" if OS == "Windows" else ":"
-    env_skip = os.environ.get("DEPLOY_DOTFILES_SKIP", "")
-    env_skip_paths = [p.strip() for p in env_skip.split(env_sep) if p.strip()]
-    skip_paths = frozenset(args.skip + env_skip_paths)
+    skip_paths = frozenset(args.skip)
 
     ctx = DeployContext(
         target_root=target_root,
