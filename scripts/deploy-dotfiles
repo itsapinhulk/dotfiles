@@ -189,10 +189,9 @@ def _check_gitconfig_include(ctx: "DeployContext", src: Path, dst: Path) -> Hand
     The include block is placed after any leading comment lines so that
     settings added below it in ~/.gitconfig can override the dotfiles config.
     """
-    include_line = f"\tpath = {src}"
     if dst.exists() and not dst.is_symlink():
         text = dst.read_text(errors="replace")
-        if include_line in text:
+        if f"path = {src}" in text:
             return HandlerResult(False, f".gitconfig already includes {src}")
         return HandlerResult(True, f"prepend [include] path={src} to {dst}")
     if not dst.exists():
@@ -202,7 +201,7 @@ def _check_gitconfig_include(ctx: "DeployContext", src: Path, dst: Path) -> Hand
 
 
 def _apply_gitconfig_include(ctx: "DeployContext", src: Path, dst: Path) -> None:
-    include_line = f"\tpath = {src}"
+    include_line = f"  path = {src}"
     include_block = f"{_GITCONFIG_COMMENT}[include]\n{include_line}\n"
 
     if dst.is_symlink():
@@ -223,7 +222,8 @@ def _apply_gitconfig_include(ctx: "DeployContext", src: Path, dst: Path) -> None
             insert_at = i + 1
         else:
             break
-    new_lines = lines[:insert_at] + ["\n" + include_block + "\n"] + lines[insert_at:]
+    sep = "\n" if insert_at > 0 else ""
+    new_lines = lines[:insert_at] + [sep + include_block + "\n"] + lines[insert_at:]
     dst.write_text("".join(new_lines))
 
 
