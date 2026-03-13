@@ -248,7 +248,8 @@ def _check_conda_condarc(ctx: "DeployContext", src: Path, dst: Path) -> HandlerR
 
 
 def _apply_conda_condarc(ctx: "DeployContext", src: Path, dst: Path) -> None:
-    ctx.maybe_apply(src, dst, _check_symlink, _apply_symlink, "link")
+    # dst was already backed up by the outer maybe_apply; apply directly.
+    _apply_symlink(ctx, src, dst)
     alias_dst = ctx.target_root / ".condarc"
     ctx.maybe_apply(dst, alias_dst, _check_symlink, _apply_symlink, "link")
 
@@ -274,7 +275,8 @@ def _check_bashrc(ctx: "DeployContext", src: Path, dst: Path) -> HandlerResult:
 
 
 def _apply_bashrc(ctx: "DeployContext", src: Path, dst: Path) -> None:
-    ctx.maybe_apply(src, dst, _check_symlink, _apply_symlink, "link")
+    # dst was already backed up by the outer maybe_apply; apply directly.
+    _apply_symlink(ctx, src, dst)
     alias_dst = ctx.target_root / ".bash_profile"
     ctx.maybe_apply(dst, alias_dst, _check_symlink, _apply_symlink, "link")
 

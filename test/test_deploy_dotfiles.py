@@ -612,6 +612,24 @@ class TestBashrcHandler(unittest.TestCase):
         self.assertTrue(alias.is_symlink())
         self.assertEqual(alias.resolve(), (self.home / ".bashrc").resolve())
 
+    def test_bashrc_updated_when_pointing_to_old_target(self):
+        """Deploying when ~/.bashrc already exists but points to the wrong repo does not crash.
+
+        The outer maybe_apply backs up ~/.bashrc before calling _apply_bashrc.
+        _apply_bashrc must not try to back it up a second time (FileExistsError).
+        """
+        if not _can_symlink():
+            self.skipTest("Symlinks not available on this platform")
+        old_repo = make_test_repo(self.tmp, "old", {"_dot_bashrc": "old content\n"})
+        new_repo = make_test_repo(self.tmp, "new", {"_dot_bashrc": "new content\n"})
+        backup_root = self.tmp / "backup"
+        # First deploy: set up ~/.bashrc → old repo
+        deploy_repos_with_priority(_make_ctx(self.home, backup_root=backup_root), [old_repo])
+        self.assertEqual((self.home / ".bashrc").read_text(), "old content\n")
+        # Second deploy with a different repo: ~/.bashrc exists but points to old target
+        deploy_repos_with_priority(_make_ctx(self.home, backup_root=backup_root), [new_repo])
+        self.assertEqual((self.home / ".bashrc").read_text(), "new content\n")
+
 
 class TestCondaHandler(unittest.TestCase):
 
@@ -640,6 +658,24 @@ class TestCondaHandler(unittest.TestCase):
         alias = self.home / ".condarc"
         self.assertTrue(alias.is_symlink())
         self.assertEqual(alias.resolve(), (self.home / ".config" / "conda" / "condarc").resolve())
+
+    def test_condarc_updated_when_pointing_to_old_target(self):
+        """Deploying when condarc already exists but points to the wrong repo does not crash.
+
+        The outer maybe_apply backs up condarc before calling _apply_conda_condarc.
+        _apply_conda_condarc must not try to back it up a second time (FileExistsError).
+        """
+        if not _can_symlink():
+            self.skipTest("Symlinks not available on this platform")
+        old_repo = make_test_repo(self.tmp, "old", {"_dot_config/conda/condarc": "channels:\n  - defaults\n"})
+        new_repo = make_test_repo(self.tmp, "new", {"_dot_config/conda/condarc": "channels:\n  - conda-forge\n"})
+        backup_root = self.tmp / "backup"
+        # First deploy: set up condarc → old repo
+        deploy_repos_with_priority(_make_ctx(self.home, backup_root=backup_root), [old_repo])
+        self.assertEqual((self.home / ".config" / "conda" / "condarc").read_text(), "channels:\n  - defaults\n")
+        # Second deploy with a different repo: condarc exists but points to old target
+        deploy_repos_with_priority(_make_ctx(self.home, backup_root=backup_root), [new_repo])
+        self.assertEqual((self.home / ".config" / "conda" / "condarc").read_text(), "channels:\n  - conda-forge\n")
 
 
 # ---------------------------------------------------------------------------
