@@ -1,0 +1,37 @@
+name: Update Submodules
+
+on:
+  schedule:
+    - cron: '0 22 * * *' # Every day at 22:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Update submodules
+        run: scripts/upgrade-git-submodules .
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v8.1.0
+        with:
+          commit-message: "Update Submodules"
+          title: "Update Submodules"
+          branch: auto/update-submodules
+          delete-branch: true
+          reviewers: itsapinhulk
