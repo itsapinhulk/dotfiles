@@ -68,8 +68,23 @@ RUN apt-get update && \
         apt-get install -y --no-install-recommends \
         git git-lfs sudo \
         ca-certificates \
+        curl \
         python3 \
-    && rm -rf /var/lib/apt/lists/*
+        ripgrep \
+        fzf \
+        fd-find \
+        cmake \
+        lua5.1 \
+        luarocks \
+        gcc \
+    && rm -rf /var/lib/apt/lists/* \
+    && ln -s /usr/bin/fdfind /usr/local/bin/fd
+
+# ── neovim (stable release) ───────────────────────────────────────────────────
+RUN ARCH="$(uname -m)" \
+    && curl -fsSL "https://github.com/neovim/neovim/releases/download/stable/nvim-linux-${ARCH}.tar.gz" \
+       | tar -xz -C /opt \
+    && ln -s "/opt/nvim-linux-${ARCH}/bin/nvim" /usr/local/bin/nvim
 
 # ── user ───────────────────────────────────────────────────────────────────────
 # Create the user, and give it sudo permission. All in one step to avoid cluttering layers
