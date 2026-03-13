@@ -44,6 +44,7 @@ RUN git clone --local --no-hardlinks --depth=1 /src /dotfiles \
                  submodule update --init --depth=1 -- "${path}"; \
          done \
     && rm -rf /dotfiles/fonts \
+    && rm -rf /dotfiles/.git/lfs \
     && echo "${GIT_SHA}" > /dotfiles/.git-sha
 
 
@@ -96,9 +97,8 @@ USER $USERNAME
 # ── copy repo ─────────────────────────────────────────────────────────────────
 # The builder stage produced a shallow clone; .git is small but fetch/merge work.
 WORKDIR /dotfiles
-COPY --from=builder /dotfiles .
-RUN sudo chown -R ${USERNAME}:${USERNAME} /dotfiles \
-    && echo "${BUILD_DATE}" > /dotfiles/.build-date
+COPY --from=builder --chown=${USERNAME}:${USERNAME} /dotfiles .
+RUN echo "${BUILD_DATE}" > /dotfiles/.build-date
 
 # ── homebrew ──────────────────────────────────────────────────────────────────
 RUN NONINTERACTIVE=1 /bin/bash -c \
@@ -109,15 +109,23 @@ ENV PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:${PATH}
 RUN python3 /dotfiles/scripts/deploy-dotfiles /dotfiles --apply
 
 # ── sync brew packages ────────────────────────────────────────────────────────
-RUN /dotfiles/scripts/sync-brew
+RUN /dotfiles/scripts/sync-brew \
+    && brew cleanup --prune=all \
+    && rm -rf "$(brew --cache)"
 
 # ── install neovim plugins ────────────────────────────────────────────────────
-# First pass: install lazy.nvim plugins
-RUN nvim --headless "+Lazy! install" +qa
+# First pass: install lazy.nvim plugins; strip .git dirs to save space
+RUN nvim --headless "+Lazy! install" +qa \
+    && find ~/.local/share/nvim/lazy -mindepth 1 -maxdepth 1 -type d \
+       -exec rm -rf {}/.git \;
 # Second pass: compile treesitter parsers (synchronous, waits for completion)
-RUN nvim --headless -c "TSUpdateSync" -c "qa"
+RUN nvim --headless -c "lua require('nvim-treesitter.install').update({ with_sync = true })()" -c "qa" \
+    && find ~/.local/share/nvim/lazy/nvim-treesitter -name '*.c' -delete \
+    && find ~/.local/share/nvim/lazy/nvim-treesitter -name '*.cc' -delete
 # Third pass: let mason finish installing tools (shfmt, stylua, etc.)
-RUN nvim --headless -c "lua vim.defer_fn(function() vim.cmd('qa!') end, 60000)" +qa
+RUN nvim --headless -c "lua vim.defer_fn(function() vim.cmd('qa!') end, 60000)" +qa \
+    && rm -rf ~/.local/share/nvim/mason/packages/*/node_modules \
+    && rm -rf ~/.local/share/nvim/mason/staging
 
 # ── switch default shell to brew bash ─────────────────────────────────────────
 RUN echo "${BREW_BASH}" | sudo tee -a /etc/shells \
