@@ -454,16 +454,6 @@ def deploy_entry(ctx: DeployContext, src: Path, subpath: Path) -> None:
     ctx.maybe_apply(src, dst, _check_symlink, _apply_symlink, "link")
 
 
-def deploy_repo(ctx: DeployContext, repo: Path) -> None:
-    """Deploy every top-level entry from one repo's settings directory."""
-    root = settings_root(repo)
-    if not root.is_dir():
-        print(f"{'[warn]':<{_LABEL_WIDTH}} settings dir not found in {repo}, skipping.", file=sys.stderr)
-        return
-    print(f"{'[repo]':<{_LABEL_WIDTH}} {repo}  (settings root: {root.relative_to(repo)}/)")
-    for child in sorted(root.iterdir()):
-        deploy_entry(ctx, child, Path(child.name))
-
 
 def _collect_leaf_subpaths(root: Path) -> list[Path]:
     """
@@ -597,10 +587,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"{'[error]':<{_LABEL_WIDTH}} Repo not found: {repo}", file=sys.stderr)
             return 1
 
-    if len(repos) == 1:
-        deploy_repo(ctx, repos[0])
-    else:
-        deploy_repos_with_priority(ctx, repos)
+    deploy_repos_with_priority(ctx, repos)
 
     return 0
 

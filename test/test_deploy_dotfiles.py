@@ -43,7 +43,7 @@ from deploy_dotfiles import (
     SpecialHandler,
     SPECIAL_HANDLERS,
     SYMLINK_WHOLE_DIRS,
-    deploy_repo,
+    deploy_repos_with_priority,
     deploy_repos_with_priority,
     make_backup,
     repo_name_to_target_name,
@@ -377,7 +377,7 @@ class TestDeployRepo(unittest.TestCase):
         if not _can_symlink():
             self.skipTest("Symlinks not available on this platform")
         repo = make_test_repo(self.tmp, "repo", {"_dot_vimrc": "set number"})
-        deploy_repo(_make_ctx(self.home), repo)
+        deploy_repos_with_priority(_make_ctx(self.home), [repo])
         vimrc = self.home / ".vimrc"
         self.assertTrue(vimrc.is_symlink())
         self.assertEqual(vimrc.read_text(), "set number")
@@ -387,7 +387,7 @@ class TestDeployRepo(unittest.TestCase):
         if not _can_symlink():
             self.skipTest("Symlinks not available on this platform")
         repo = make_test_repo(self.tmp, "repo", {"_dot_config/vim/init.vim": "set number"})
-        deploy_repo(_make_ctx(self.home), repo)
+        deploy_repos_with_priority(_make_ctx(self.home), [repo])
         init_vim = self.home / ".config" / "vim" / "init.vim"
         self.assertTrue(init_vim.is_symlink())
         self.assertEqual(init_vim.read_text(), "set number")
@@ -479,7 +479,7 @@ class TestIntegration(unittest.TestCase):
             "_dot_vimrc": "set number",
             "_dot_vim/init.vim": "set number",
         })
-        deploy_repo(_make_ctx(self.home), repo)
+        deploy_repos_with_priority(_make_ctx(self.home), [repo])
         self.assertTrue((self.home / ".vimrc").is_symlink())
         self.assertEqual((self.home / ".vimrc").read_text(), "set number")
         self.assertTrue((self.home / ".vim" / "init.vim").is_symlink())
@@ -493,7 +493,7 @@ class TestIntegration(unittest.TestCase):
         backup_root = self.tmp / "backup"
         repo = make_test_repo(self.tmp, "repo", {"_dot_bashrc": "new config"})
         ctx = _make_ctx(self.home, backup_root=backup_root)
-        deploy_repo(ctx, repo)
+        deploy_repos_with_priority(ctx, [repo])
         self.assertTrue((self.home / ".bashrc").is_symlink())
         self.assertEqual((self.home / ".bashrc").read_text(), "new config")
         self.assertEqual(ctx.run_backup_dir.parent, backup_root)
@@ -521,7 +521,7 @@ class TestGitconfigHandler(unittest.TestCase):
     def test_gitconfig_gets_include_not_symlink(self):
         """_dot_gitconfig is deployed via [include], not a plain symlink."""
         repo = make_test_repo(self.tmp, "repo", {"_dot_gitconfig": "[user]\n\tname = Test\n"})
-        deploy_repo(_make_ctx(self.home), repo)
+        deploy_repos_with_priority(_make_ctx(self.home), [repo])
         gitconfig = self.home / ".gitconfig"
         self.assertFalse(gitconfig.is_symlink())
         self.assertIn("[include]", gitconfig.read_text())
@@ -530,16 +530,16 @@ class TestGitconfigHandler(unittest.TestCase):
         """The [include] path points to the repo's _dot_gitconfig."""
         repo = make_test_repo(self.tmp, "repo", {"_dot_gitconfig": "[user]\n\tname = Test\n"})
         src = repo / "settings" / "_dot_gitconfig"
-        deploy_repo(_make_ctx(self.home), repo)
+        deploy_repos_with_priority(_make_ctx(self.home), [repo])
         self.assertIn(str(src), (self.home / ".gitconfig").read_text())
 
     def test_gitconfig_idempotent(self):
         """Deploying twice does not duplicate the [include] block."""
         repo = make_test_repo(self.tmp, "repo", {"_dot_gitconfig": "[user]\n\tname = Test\n"})
         ctx = _make_ctx(self.home)
-        deploy_repo(ctx, repo)
+        deploy_repos_with_priority(ctx, [repo])
         content_after_first = (self.home / ".gitconfig").read_text()
-        deploy_repo(ctx, repo)
+        deploy_repos_with_priority(ctx, [repo])
         self.assertEqual((self.home / ".gitconfig").read_text(), content_after_first)
 
 
@@ -562,7 +562,7 @@ class TestBashrcHandler(unittest.TestCase):
         if not _can_symlink():
             self.skipTest("Symlinks not available on this platform")
         repo = make_test_repo(self.tmp, "repo", {"_dot_bashrc": "export PATH=~/bin:$PATH\n"})
-        deploy_repo(_make_ctx(self.home), repo)
+        deploy_repos_with_priority(_make_ctx(self.home), [repo])
         self.assertTrue((self.home / ".bashrc").is_symlink())
 
     def test_bash_profile_alias_created(self):
@@ -570,7 +570,7 @@ class TestBashrcHandler(unittest.TestCase):
         if not _can_symlink():
             self.skipTest("Symlinks not available on this platform")
         repo = make_test_repo(self.tmp, "repo", {"_dot_bashrc": "export PATH=~/bin:$PATH\n"})
-        deploy_repo(_make_ctx(self.home), repo)
+        deploy_repos_with_priority(_make_ctx(self.home), [repo])
         alias = self.home / ".bash_profile"
         self.assertTrue(alias.is_symlink())
         self.assertEqual(alias.resolve(), (self.home / ".bashrc").resolve())
@@ -591,7 +591,7 @@ class TestCondaHandler(unittest.TestCase):
         if not _can_symlink():
             self.skipTest("Symlinks not available on this platform")
         repo = make_test_repo(self.tmp, "repo", {"_dot_config/conda/condarc": "channels:\n  - defaults\n"})
-        deploy_repo(_make_ctx(self.home), repo)
+        deploy_repos_with_priority(_make_ctx(self.home), [repo])
         self.assertTrue((self.home / ".config" / "conda" / "condarc").is_symlink())
 
     def test_condarc_alias_created(self):
@@ -599,7 +599,7 @@ class TestCondaHandler(unittest.TestCase):
         if not _can_symlink():
             self.skipTest("Symlinks not available on this platform")
         repo = make_test_repo(self.tmp, "repo", {"_dot_config/conda/condarc": "channels:\n  - defaults\n"})
-        deploy_repo(_make_ctx(self.home), repo)
+        deploy_repos_with_priority(_make_ctx(self.home), [repo])
         alias = self.home / ".condarc"
         self.assertTrue(alias.is_symlink())
         self.assertEqual(alias.resolve(), (self.home / ".config" / "conda" / "condarc").resolve())
@@ -628,7 +628,7 @@ class TestSymlinkWholeDirs(unittest.TestCase):
             "_dot_config/nvim/lua/init.lua": "-- init",
             "_dot_config/nvim/lua/plugin.lua": "-- plugin",
         })
-        deploy_repo(_make_ctx(self.home), repo)
+        deploy_repos_with_priority(_make_ctx(self.home), [repo])
         lua_dir = self.home / ".config" / "nvim" / "lua"
         # The directory itself should be a symlink, not its contents individually
         self.assertTrue(lua_dir.is_symlink())
@@ -664,7 +664,7 @@ class TestSkipPaths(unittest.TestCase):
             verbose=False,
             skip_paths=frozenset({".bashrc"}),
         )
-        deploy_repo(ctx, repo)
+        deploy_repos_with_priority(ctx, [repo])
         self.assertFalse((self.home / ".bashrc").exists())
         self.assertTrue((self.home / ".vimrc").is_symlink())
 
