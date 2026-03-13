@@ -111,6 +111,14 @@ RUN python3 /dotfiles/scripts/deploy-dotfiles /dotfiles --apply
 # ── sync brew packages ────────────────────────────────────────────────────────
 RUN /dotfiles/scripts/sync-brew
 
+# ── install neovim plugins ────────────────────────────────────────────────────
+# First pass: install lazy.nvim plugins
+RUN nvim --headless "+Lazy! install" +qa
+# Second pass: compile treesitter parsers (synchronous, waits for completion)
+RUN nvim --headless -c "TSUpdateSync" -c "qa"
+# Third pass: let mason finish installing tools (shfmt, stylua, etc.)
+RUN nvim --headless -c "lua vim.defer_fn(function() vim.cmd('qa!') end, 60000)" +qa
+
 # ── switch default shell to brew bash ─────────────────────────────────────────
 RUN echo "${BREW_BASH}" | sudo tee -a /etc/shells \
     && sudo chsh -s "${BREW_BASH}" ${USERNAME}
