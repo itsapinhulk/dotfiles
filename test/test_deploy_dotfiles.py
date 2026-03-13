@@ -203,42 +203,44 @@ class TestMakeBackup(unittest.TestCase):
         shutil.rmtree(self.tmp)
 
     def test_backup_file(self):
-        """A file is copied into dest_dir."""
+        """A file is copied to dest."""
         src = self.tmp / "file.txt"
         src.write_text("content")
-        make_backup(src, self.dest, dry_run=False)
+        dest = self.dest / "file.txt"
+        make_backup(src, dest, dry_run=False)
         if platform.system() == "Windows":
             # Windows writes a pointer .txt file instead of copying
             pointer = (self.dest / "file.txt.txt").read_text()
             self.assertEqual(Path(pointer).resolve(), src.resolve())
         else:
-            self.assertEqual((self.dest / "file.txt").read_text(), "content")
+            self.assertEqual(dest.read_text(), "content")
         self.assertTrue(src.exists())  # original untouched
 
     def test_backup_directory(self):
-        """A directory is copied into dest_dir."""
+        """A directory is copied to dest."""
         src = self.tmp / "mydir"
         src.mkdir()
         (src / "file.txt").write_text("content")
-        make_backup(src, self.dest, dry_run=False)
+        dest = self.dest / "mydir"
+        make_backup(src, dest, dry_run=False)
         if platform.system() == "Windows":
             # Windows writes a pointer .txt file instead of copying
             pointer = (self.dest / "mydir.txt").read_text()
             self.assertEqual(Path(pointer).resolve(), src.resolve())
         else:
-            self.assertTrue((self.dest / "mydir").is_dir())
-            self.assertEqual((self.dest / "mydir" / "file.txt").read_text(), "content")
+            self.assertTrue(dest.is_dir())
+            self.assertEqual((dest / "file.txt").read_text(), "content")
 
     def test_backup_nonexistent_is_noop(self):
         """Backing up a nonexistent path does nothing (no error)."""
-        make_backup(self.tmp / "nonexistent", self.dest, dry_run=False)
+        make_backup(self.tmp / "nonexistent", self.dest / "nonexistent", dry_run=False)
         self.assertFalse(self.dest.exists())
 
     def test_backup_dry_run_creates_nothing(self):
         """dry_run=True does not write any files."""
         src = self.tmp / "file.txt"
         src.write_text("content")
-        make_backup(src, self.dest, dry_run=True)
+        make_backup(src, self.dest / "file.txt", dry_run=True)
         self.assertFalse(self.dest.exists())
 
 
@@ -298,6 +300,43 @@ class TestDeployContext(unittest.TestCase):
         )
         self.assertIsNotNone(ctx.run_backup_dir)
         self.assertEqual(ctx.run_backup_dir.parent, backup)
+
+    def test_backup_path_outside_target_root(self):
+        """ctx.backup falls back to path.name when path is outside target_root.
+
+        On Windows, OS_PATH_MAP redirects some paths (e.g. .config/nvim) to
+        AppData locations that are outside a test's temp target_root.  This
+        exercises the ValueError fallback in ctx.backup.
+        """
+        home = self.tmp / "home"
+        home.mkdir()
+        outside = self.tmp / "other_dir"
+        outside.mkdir()
+        target_file = outside / ".nvimrc"
+        target_file.write_text("colorscheme dark")
+        backup_root = self.tmp / "backup"
+        ctx = _make_ctx(home, backup_root=backup_root)
+        # path is outside target_root → relative_to raises ValueError
+        ctx.backup(target_file)
+        expected = ctx.run_backup_dir / "_dot_nvimrc"
+        self.assertTrue(expected.exists())
+        self.assertEqual(expected.read_text(), "colorscheme dark")
+
+    def test_backup_translates_dot_components(self):
+        """ctx.backup translates all dotted path components under target_root."""
+        home = self.tmp / "home"
+        home.mkdir()
+        # Create .config/vim/init.vim under home
+        nested = home / ".config" / "vim"
+        nested.mkdir(parents=True)
+        target_file = nested / "init.vim"
+        target_file.write_text("set number")
+        backup_root = self.tmp / "backup"
+        ctx = _make_ctx(home, backup_root=backup_root)
+        ctx.backup(target_file)
+        expected = ctx.run_backup_dir / "_dot_config" / "vim" / "init.vim"
+        self.assertTrue(expected.exists())
+        self.assertEqual(expected.read_text(), "set number")
 
 
 # ---------------------------------------------------------------------------
@@ -459,10 +498,10 @@ class TestIntegration(unittest.TestCase):
         self.assertEqual((self.home / ".bashrc").read_text(), "new config")
         self.assertEqual(ctx.run_backup_dir.parent, backup_root)
         if platform.system() == "Windows":
-            pointer = (ctx.run_backup_dir / ".bashrc.txt").read_text()
+            pointer = (ctx.run_backup_dir / "_dot_bashrc.txt").read_text()
             self.assertEqual(Path(pointer).resolve(), (self.home / ".bashrc").resolve())
         else:
-            self.assertEqual((ctx.run_backup_dir / ".bashrc").read_text(), "old config")
+            self.assertEqual((ctx.run_backup_dir / "_dot_bashrc").read_text(), "old config")
 
 
 # ---------------------------------------------------------------------------
