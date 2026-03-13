@@ -228,68 +228,19 @@ def _apply_gitconfig_include(ctx: "DeployContext", src: Path, dst: Path) -> None
 
 
 # ---------------------------------------------------------------------------
-# Special handler: .config/conda/condarc — symlink file + create ~/.condarc alias
-# ---------------------------------------------------------------------------
-
-def _check_conda_condarc(ctx: "DeployContext", src: Path, dst: Path) -> HandlerResult:
-    """
-    Symlink .config/conda/condarc from the repo as usual, then also create:
-
-        ~/.condarc  →  ~/.config/conda/condarc
-
-    so both conda lookup paths resolve to the same file.
-    """
-    file_result = _check_symlink(ctx, src, dst)
-    alias_dst = ctx.target_root / ".condarc"
-    alias_result = _check_symlink(ctx, dst, alias_dst)
-    changed = file_result.changed or alias_result.changed
-    desc_parts = [r.description for r in (file_result, alias_result) if r.changed]
-    return HandlerResult(changed, "; ".join(desc_parts) if desc_parts else file_result.description)
-
-
-def _apply_conda_condarc(ctx: "DeployContext", src: Path, dst: Path) -> None:
-    # dst was already backed up by the outer maybe_apply; apply directly.
-    _apply_symlink(ctx, src, dst)
-    alias_dst = ctx.target_root / ".condarc"
-    ctx.maybe_apply(dst, alias_dst, _check_symlink, _apply_symlink, "link")
-
-
-# ---------------------------------------------------------------------------
-# Special handler: .bashrc — symlink file + create ~/.bash_profile alias
-# ---------------------------------------------------------------------------
-
-def _check_bashrc(ctx: "DeployContext", src: Path, dst: Path) -> HandlerResult:
-    """
-    Symlink .bashrc from the repo as usual, then also create:
-
-        ~/.bash_profile  →  ~/.bashrc
-
-    so login shells and interactive shells both source the same config.
-    """
-    file_result = _check_symlink(ctx, src, dst)
-    alias_dst = ctx.target_root / ".bash_profile"
-    alias_result = _check_symlink(ctx, dst, alias_dst)
-    changed = file_result.changed or alias_result.changed
-    desc_parts = [r.description for r in (file_result, alias_result) if r.changed]
-    return HandlerResult(changed, "; ".join(desc_parts) if desc_parts else file_result.description)
-
-
-def _apply_bashrc(ctx: "DeployContext", src: Path, dst: Path) -> None:
-    # dst was already backed up by the outer maybe_apply; apply directly.
-    _apply_symlink(ctx, src, dst)
-    alias_dst = ctx.target_root / ".bash_profile"
-    ctx.maybe_apply(dst, alias_dst, _check_symlink, _apply_symlink, "link")
-
-
-# ---------------------------------------------------------------------------
-# Special handler registry and whole-dir symlink list
+# Special handler registry, whole-dir symlink list, and symlink aliases
 # ---------------------------------------------------------------------------
 
 # Keys are *translated* subpaths relative to target root (POSIX strings).
 SPECIAL_HANDLERS: dict[str, SpecialHandler] = {
-    ".gitconfig":            SpecialHandler(_check_gitconfig_include, _apply_gitconfig_include),
-    ".bashrc":               SpecialHandler(_check_bashrc, _apply_bashrc),
-    ".config/conda/condarc": SpecialHandler(_check_conda_condarc, _apply_conda_condarc),
+    ".gitconfig": SpecialHandler(_check_gitconfig_include, _apply_gitconfig_include),
+}
+
+# After a primary key is deployed, also symlink alias_dst → primary_dst.
+# Both keys are translated subpaths relative to target root (POSIX strings).
+SYMLINK_ALIASES: dict[str, str] = {
+    ".bashrc":               ".bash_profile",
+    ".config/conda/condarc": ".condarc",
 }
 
 # Width of the bracketed label column in log output, e.g. "[priority-skip]" = 15.
@@ -506,6 +457,12 @@ def deploy_repos_with_priority(ctx: DeployContext, repos: list[Path]) -> None:
                 continue
             seen.add(key)
             deploy_entry(ctx, root / subpath, subpath)
+            if key in SYMLINK_ALIASES:
+                alias_key = SYMLINK_ALIASES[key]
+                if key not in ctx.skip_paths and alias_key not in ctx.skip_paths:
+                    alias_src = ctx.target_root / key
+                    alias_dst = ctx.target_root / alias_key
+                    ctx.maybe_apply(alias_src, alias_dst, _check_symlink, _apply_symlink, "link")
 
 
 # ---------------------------------------------------------------------------

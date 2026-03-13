@@ -15,6 +15,7 @@ Cross-platform notes
 
 from __future__ import annotations
 
+import os
 import importlib.machinery
 import importlib.util
 import io
@@ -611,6 +612,97 @@ class TestBashrcHandler(unittest.TestCase):
         alias = self.home / ".bash_profile"
         self.assertTrue(alias.is_symlink())
         self.assertEqual(alias.resolve(), (self.home / ".bashrc").resolve())
+
+    def test_bash_profile_alias_not_created_when_bashrc_priority_skipped(self):
+        """~/.bash_profile is not created when .bashrc is priority-skipped by an earlier repo."""
+        if not _can_symlink():
+            self.skipTest("Symlinks not available on this platform")
+        first_repo = make_test_repo(self.tmp, "first", {"_dot_bashrc": "first\n"})
+        second_repo = make_test_repo(self.tmp, "second", {"_dot_bashrc": "second\n"})
+        # Deploy both repos; second_repo's .bashrc is priority-skipped
+        deploy_repos_with_priority(_make_ctx(self.home), [first_repo, second_repo])
+        # .bashrc comes from first_repo
+        self.assertEqual((self.home / ".bashrc").read_text(), "first\n")
+        # .bash_profile should still exist (created when first_repo's .bashrc was deployed)
+        self.assertTrue((self.home / ".bash_profile").is_symlink())
+        # Re-deploy with only second_repo to confirm alias is created fresh
+        shutil.rmtree(self.home)
+        self.home.mkdir()
+        deploy_repos_with_priority(_make_ctx(self.home), [second_repo])
+        self.assertTrue((self.home / ".bash_profile").is_symlink())
+
+    def test_bash_profile_alias_not_created_when_bashrc_skipped(self):
+        """~/.bash_profile is not updated when .bashrc is in skip_paths.
+
+        Sets up a stale .bash_profile pointing nowhere, then deploys with .bashrc
+        skipped — the alias must not be touched.
+        """
+        if not _can_symlink():
+            self.skipTest("Symlinks not available on this platform")
+        repo = make_test_repo(self.tmp, "repo", {"_dot_bashrc": "export PATH=~/bin:$PATH\n"})
+        # Plant a stale .bash_profile so we can detect if the alias code runs
+        stale_target = self.tmp / "nowhere"
+        (self.home / ".bash_profile").symlink_to(stale_target)
+        ctx = DeployContext(
+            target_root=self.home,
+            backup_root=None,
+            dry_run=False,
+            verbose=False,
+            skip_paths=frozenset({".bashrc"}),
+        )
+        deploy_repos_with_priority(ctx, [repo])
+        self.assertFalse((self.home / ".bashrc").exists())
+        # .bash_profile must be unchanged — still the stale symlink
+        self.assertEqual(Path(os.readlink(self.home / ".bash_profile")), stale_target)
+
+    def test_bash_profile_alias_not_created_when_bash_profile_skipped(self):
+        """~/.bash_profile is not updated when .bash_profile itself is in skip_paths."""
+        if not _can_symlink():
+            self.skipTest("Symlinks not available on this platform")
+        repo = make_test_repo(self.tmp, "repo", {"_dot_bashrc": "export PATH=~/bin:$PATH\n"})
+        # Plant a stale .bash_profile so we can detect if the alias code runs
+        stale_target = self.tmp / "nowhere"
+        (self.home / ".bash_profile").symlink_to(stale_target)
+        ctx = DeployContext(
+            target_root=self.home,
+            backup_root=None,
+            dry_run=False,
+            verbose=False,
+            skip_paths=frozenset({".bash_profile"}),
+        )
+        deploy_repos_with_priority(ctx, [repo])
+        self.assertTrue((self.home / ".bashrc").is_symlink())
+        # .bash_profile must be unchanged — still the stale symlink
+        self.assertEqual(Path(os.readlink(self.home / ".bash_profile")), stale_target)
+
+    def test_bashrc_redeployed_when_stale_alias_is_not(self):
+        """When ~/.bashrc points to the wrong target but ~/.bash_profile is correct, only .bashrc is updated."""
+        if not _can_symlink():
+            self.skipTest("Symlinks not available on this platform")
+        old_repo = make_test_repo(self.tmp, "old", {"_dot_bashrc": "old\n"})
+        new_repo = make_test_repo(self.tmp, "new", {"_dot_bashrc": "new\n"})
+        deploy_repos_with_priority(_make_ctx(self.home), [old_repo])
+        bashrc = self.home / ".bashrc"
+        bash_profile = self.home / ".bash_profile"
+        # Deploy new repo: .bashrc is stale, .bash_profile already points to .bashrc (correct)
+        deploy_repos_with_priority(_make_ctx(self.home), [new_repo])
+        self.assertEqual(bashrc.read_text(), "new\n")
+        self.assertTrue(bash_profile.is_symlink())
+        self.assertEqual(bash_profile.resolve(), bashrc.resolve())
+
+    def test_alias_redeployed_when_primary_is_not_stale(self):
+        """When ~/.bash_profile is missing but ~/.bashrc is correct, only the alias is updated."""
+        if not _can_symlink():
+            self.skipTest("Symlinks not available on this platform")
+        repo = make_test_repo(self.tmp, "repo", {"_dot_bashrc": "content\n"})
+        deploy_repos_with_priority(_make_ctx(self.home), [repo])
+        # Remove the alias to simulate it being missing
+        (self.home / ".bash_profile").unlink()
+        self.assertFalse((self.home / ".bash_profile").exists())
+        # Redeploy: .bashrc is already correct, only alias should be (re)created
+        deploy_repos_with_priority(_make_ctx(self.home), [repo])
+        self.assertTrue((self.home / ".bash_profile").is_symlink())
+        self.assertEqual((self.home / ".bash_profile").resolve(), (self.home / ".bashrc").resolve())
 
     def test_bashrc_updated_when_pointing_to_old_target(self):
         """Deploying when ~/.bashrc already exists but points to the wrong repo does not crash.
