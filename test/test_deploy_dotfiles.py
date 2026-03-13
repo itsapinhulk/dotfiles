@@ -58,6 +58,21 @@ from deploy_dotfiles import (
 # Helpers
 # ---------------------------------------------------------------------------
 
+def _readlink(path: Path) -> Path:
+    """Return the symlink target, stripping the Windows extended-length prefix if present.
+
+    On Windows, os.readlink() may return a path prefixed with //?/ or \\\\?\\ that
+    wasn't part of the original target path used when creating the symlink.
+    """
+    target = Path(os.readlink(path))
+    if sys.platform == "win32":
+        s = str(target)
+        for prefix in ("//?/", "\\\\?\\"):
+            if s.startswith(prefix):
+                return Path(s[len(prefix):])
+    return target
+
+
 def _can_symlink() -> bool:
     """Return True if the current process can create symlinks."""
     with tempfile.TemporaryDirectory() as tmp:
@@ -653,7 +668,7 @@ class TestBashrcHandler(unittest.TestCase):
         deploy_repos_with_priority(ctx, [repo])
         self.assertFalse((self.home / ".bashrc").exists())
         # .bash_profile must be unchanged — still the stale symlink
-        self.assertEqual(Path(os.readlink(self.home / ".bash_profile")), stale_target)
+        self.assertEqual(_readlink(self.home / ".bash_profile"), stale_target)
 
     def test_bash_profile_alias_not_created_when_bash_profile_skipped(self):
         """~/.bash_profile is not updated when .bash_profile itself is in skip_paths."""
@@ -673,7 +688,7 @@ class TestBashrcHandler(unittest.TestCase):
         deploy_repos_with_priority(ctx, [repo])
         self.assertTrue((self.home / ".bashrc").is_symlink())
         # .bash_profile must be unchanged — still the stale symlink
-        self.assertEqual(Path(os.readlink(self.home / ".bash_profile")), stale_target)
+        self.assertEqual(_readlink(self.home / ".bash_profile"), stale_target)
 
     def test_bashrc_redeployed_when_stale_alias_is_not(self):
         """When ~/.bashrc points to the wrong target but ~/.bash_profile is correct, only .bashrc is updated."""
