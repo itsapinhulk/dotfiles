@@ -671,6 +671,21 @@ class TestSymlinkWholeDirs(unittest.TestCase):
         self.assertTrue(lua_dir.is_symlink())
         self.assertFalse((lua_dir / "init.lua").is_symlink())  # files inside are not symlinks
 
+    def test_tmuxp_dir_symlinked_as_whole(self):
+        """.config/tmuxp is symlinked as a whole directory, not recursed into."""
+        if not _can_symlink():
+            self.skipTest("Symlinks not available on this platform")
+        repo = make_test_repo(self.tmp, "repo", {
+            "_dot_config/tmuxp/work.yaml": "session_name: work\n",
+            "_dot_config/tmuxp/personal.yaml": "session_name: personal\n",
+        })
+        deploy_repos_with_priority(_make_ctx(self.home), [repo])
+        tmuxp_dir = self.home / ".config" / "tmuxp"
+        # The directory itself should be a symlink, not its contents individually
+        self.assertTrue(tmuxp_dir.is_symlink())
+        self.assertFalse((tmuxp_dir / "work.yaml").is_symlink())
+        self.assertEqual((tmuxp_dir / "work.yaml").read_text(), "session_name: work\n")
+
 
 # ---------------------------------------------------------------------------
 # Tests for skip_paths
