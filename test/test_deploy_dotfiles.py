@@ -318,9 +318,13 @@ class TestDeployContext(unittest.TestCase):
         ctx = _make_ctx(home, backup_root=backup_root)
         # path is outside target_root → relative_to raises ValueError
         ctx.backup(target_file)
-        expected = ctx.run_backup_dir / "_dot_nvimrc"
-        self.assertTrue(expected.exists())
-        self.assertEqual(expected.read_text(), "colorscheme dark")
+        if platform.system() == "Windows":
+            pointer = (ctx.run_backup_dir / "_dot_nvimrc.txt").read_text()
+            self.assertEqual(Path(pointer).resolve(), target_file.resolve())
+        else:
+            expected = ctx.run_backup_dir / "_dot_nvimrc"
+            self.assertTrue(expected.exists())
+            self.assertEqual(expected.read_text(), "colorscheme dark")
 
     def test_backup_translates_dot_components(self):
         """ctx.backup translates all dotted path components under target_root."""
@@ -334,9 +338,13 @@ class TestDeployContext(unittest.TestCase):
         backup_root = self.tmp / "backup"
         ctx = _make_ctx(home, backup_root=backup_root)
         ctx.backup(target_file)
-        expected = ctx.run_backup_dir / "_dot_config" / "vim" / "init.vim"
-        self.assertTrue(expected.exists())
-        self.assertEqual(expected.read_text(), "set number")
+        if platform.system() == "Windows":
+            pointer = (ctx.run_backup_dir / "_dot_config" / "vim" / "init.vim.txt").read_text()
+            self.assertEqual(Path(pointer).resolve(), target_file.resolve())
+        else:
+            expected = ctx.run_backup_dir / "_dot_config" / "vim" / "init.vim"
+            self.assertTrue(expected.exists())
+            self.assertEqual(expected.read_text(), "set number")
 
 
 # ---------------------------------------------------------------------------
