@@ -547,6 +547,35 @@ class TestGitconfigHandler(unittest.TestCase):
 # Tests for .config/conda/condarc special handler
 # ---------------------------------------------------------------------------
 
+class TestBashrcHandler(unittest.TestCase):
+
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp())
+        self.home = self.tmp / "home"
+        self.home.mkdir()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp)
+
+    def test_bashrc_file_symlinked(self):
+        """_dot_bashrc is symlinked into ~/.bashrc."""
+        if not _can_symlink():
+            self.skipTest("Symlinks not available on this platform")
+        repo = make_test_repo(self.tmp, "repo", {"_dot_bashrc": "export PATH=~/bin:$PATH\n"})
+        deploy_repo(_make_ctx(self.home), repo)
+        self.assertTrue((self.home / ".bashrc").is_symlink())
+
+    def test_bash_profile_alias_created(self):
+        """~/.bash_profile is created as a symlink to ~/.bashrc."""
+        if not _can_symlink():
+            self.skipTest("Symlinks not available on this platform")
+        repo = make_test_repo(self.tmp, "repo", {"_dot_bashrc": "export PATH=~/bin:$PATH\n"})
+        deploy_repo(_make_ctx(self.home), repo)
+        alias = self.home / ".bash_profile"
+        self.assertTrue(alias.is_symlink())
+        self.assertEqual(alias.resolve(), (self.home / ".bashrc").resolve())
+
+
 class TestCondaHandler(unittest.TestCase):
 
     def setUp(self):

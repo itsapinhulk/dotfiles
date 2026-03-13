@@ -256,12 +256,39 @@ def _apply_conda_condarc(ctx: "DeployContext", src: Path, dst: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Special handler: .bashrc — symlink file + create ~/.bash_profile alias
+# ---------------------------------------------------------------------------
+
+def _check_bashrc(ctx: "DeployContext", src: Path, dst: Path) -> HandlerResult:
+    """
+    Symlink .bashrc from the repo as usual, then also create:
+
+        ~/.bash_profile  →  ~/.bashrc
+
+    so login shells and interactive shells both source the same config.
+    """
+    file_result = _check_symlink(ctx, src, dst)
+    alias_dst = ctx.target_root / ".bash_profile"
+    alias_result = _check_symlink(ctx, dst, alias_dst)
+    changed = file_result.changed or alias_result.changed
+    desc_parts = [r.description for r in (file_result, alias_result) if r.changed]
+    return HandlerResult(changed, "; ".join(desc_parts) if desc_parts else file_result.description)
+
+
+def _apply_bashrc(ctx: "DeployContext", src: Path, dst: Path) -> None:
+    ctx.maybe_apply(src, dst, _check_symlink, _apply_symlink, "link")
+    alias_dst = ctx.target_root / ".bash_profile"
+    ctx.maybe_apply(dst, alias_dst, _check_symlink, _apply_symlink, "link")
+
+
+# ---------------------------------------------------------------------------
 # Special handler registry and whole-dir symlink list
 # ---------------------------------------------------------------------------
 
 # Keys are *translated* subpaths relative to target root (POSIX strings).
 SPECIAL_HANDLERS: dict[str, SpecialHandler] = {
-    ".gitconfig":          SpecialHandler(_check_gitconfig_include, _apply_gitconfig_include),
+    ".gitconfig":            SpecialHandler(_check_gitconfig_include, _apply_gitconfig_include),
+    ".bashrc":               SpecialHandler(_check_bashrc, _apply_bashrc),
     ".config/conda/condarc": SpecialHandler(_check_conda_condarc, _apply_conda_condarc),
 }
 
