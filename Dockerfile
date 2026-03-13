@@ -28,7 +28,10 @@ RUN apt-get update && \
 WORKDIR /src
 COPY . .
 
-RUN git clone --local --no-hardlinks --depth=1 /src /dotfiles \
+# GIT_LFS_SKIP_SMUDGE=1 prevents git from trying to download LFS objects (e.g. fonts)
+# during checkout — the LFS objects aren't available in the local clone, and fonts/
+# is deleted below anyway.
+RUN GIT_LFS_SKIP_SMUDGE=1 git clone --local --no-hardlinks --depth=1 /src /dotfiles \
     && git -C /dotfiles remote remove origin \
     && if [ -n "${REPO_URL}" ]; then \
            git -C /dotfiles remote add origin "${REPO_URL}"; \
