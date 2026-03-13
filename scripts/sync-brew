@@ -1,6 +1,11 @@
 #!/bin/env bash
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
+if ! command -v brew &> /dev/null; then
+  echo "error: brew is not available" >&2
+  exit 1
+fi
+
 _target_brewfile="${DOTFILES_BREWFILE:-$SCRIPT_DIR/Brewfile}"
 
 set -x
