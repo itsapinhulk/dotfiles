@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Sync dotfiles repos to home directory.
+#   DOTFILES_SYNC_REPOS  colon-separated list of repo paths (default: this repo)
+#   DOTFILES_SYNC_SKIP   colon-separated list of target paths to skip
+set -euo pipefail
+
+_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+IFS=':' read -ra repos <<< "${DOTFILES_SYNC_REPOS:-$(dirname "$_SCRIPT_DIR")}"
+
+skip_args=()
+if [[ -n "${DOTFILES_SYNC_SKIP:-}" ]]; then
+    IFS=':' read -ra skips <<< "$DOTFILES_SYNC_SKIP"
+    for s in "${skips[@]}"; do
+        skip_args+=(--skip "$s")
+    done
+fi
+
+echo "Customize sync-dotfiles behavior by setting DOTFILES_SYNC_REPOS / DOTFILES_SYNC_SKIP env vars."
+(
+    set -x
+    exec deploy-dotfiles "${repos[@]}" "${skip_args[@]}" "$@"
+)

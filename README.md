@@ -12,7 +12,7 @@ Or, if you are maintaining your own dotfiles and this one is a submodule, you ca
 
 `deploy-dotfiles <main-repo> <fallback-repo> ... [--apply]`
 
-The .bashrc has a helper function `sync-dotfiles` which calls the above, which can be further customized by 
+The repo also includes a `sync-dotfiles` script which calls the above, and can be further customized by
 setting `DOTFILES_SYNC_REPOS` and `DOTFILES_SYNC_SKIP`.
 
 ## Manual Setup
