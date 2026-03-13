@@ -8,10 +8,11 @@ ARG USER_GID=$USER_UID
 RUN groupadd --gid $USER_GID $USERNAME \
     && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME
 
-RUN apt-get update \
-    && apt-get install -y sudo git git-lfs curl ca-certificates curl \
+RUN apt update \
+    && apt install -y sudo git git-lfs curl ca-certificates curl \
     && apt remove \
-        $(dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc | cut -f1)
+        $(dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc | cut -f1) \
+    && rm -rf /var/lib/apt/lists/*
 
 # Allow sudo for the user
 RUN echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
@@ -33,7 +34,8 @@ Signed-By: /etc/apt/keyrings/docker.asc
 EOF
 
 RUN apt update \
-    && apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+    && apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y \
+    && rm -rf /var/lib/apt/lists/*
 
 # Ensure workspace dir is owned correctly
 RUN mkdir -p /repo && chown $USERNAME:$USERNAME /repo

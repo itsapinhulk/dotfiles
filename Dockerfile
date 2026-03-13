@@ -30,6 +30,7 @@ RUN apt-get update && \
         apt-get install -y --no-install-recommends \
         git git-lfs sudo \
         ca-certificates \
+        python3 \
     && rm -rf /var/lib/apt/lists/*
 
 # ── user ───────────────────────────────────────────────────────────────────────
@@ -52,7 +53,10 @@ USER $USERNAME
 # .dockerignore should exclude build artefacts, secrets, etc.
 WORKDIR /dotfiles
 COPY . .
-RUN sudo chown -R ${USERNAME}:${USERNAME} /dotfiles
+RUN sudo chown -R ${USERNAME}:${USERNAME} /dotfiles \
+    && git config core.autocrlf input \
+    && git rm --cached -r . \
+    && git reset --hard
 
 # Rewrite the origin remote to the canonical https:// URL so that
 # `git pull` / `git fetch` works from inside a running container.
@@ -62,4 +66,7 @@ RUN if [ -n "${REPO_URL}" ]; then git remote set-url origin "${REPO_URL}"; fi \
     && echo "${GIT_SHA}" > /dotfiles/.git-sha \
     && echo "${BUILD_DATE}" > /dotfiles/.build-date
 
-# TODO: install dotfiles
+# ── install dotfiles ──────────────────────────────────────────────────────────
+RUN python3 /dotfiles/scripts/deploy-dotfiles /dotfiles --apply
+
+CMD ["sleep", "infinity"]
