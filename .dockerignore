@@ -1,9 +1,5 @@
 # Keep the image lean – exclude things that don't belong in the container.
 
-.git/objects/pack   # large pack files aren't needed; .git itself IS needed
-                    # so git remote set-url works during build
-                    # (remove this block if you don't want .git at all)
-
 .jj/    # Jujutsu isn't needed inside the image, git is sufficient.
 
 # Common artefacts

@@ -9,7 +9,45 @@
 #   BUILD_DATE – YYYYMMDD-hhmm for the image tag
 
 
-# ── base ──────────────────────────────────────────────────────────────────────
+# ── builder ───────────────────────────────────────────────────────────────────
+# Shallow-clone the repo so the final image carries a small .git directory
+# (enough for `git fetch` / `git merge`) rather than the full object history.
+# Also remove the fonts/ directory to save space, since it isn't useful inside a container.
+FROM ubuntu:24.04 AS builder
+
+ARG REPO_URL=""
+ARG GIT_SHA="unknown"
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        git git-lfs \
+        ca-certificates \
+    && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /src
+COPY . .
+
+RUN git clone --local --no-hardlinks --depth=1 /src /dotfiles \
+    && git -C /dotfiles remote remove origin \
+    && if [ -n "${REPO_URL}" ]; then \
+           git -C /dotfiles remote add origin "${REPO_URL}"; \
+       fi \
+    && git -C /dotfiles config --file /dotfiles/.gitmodules --get-regexp '^submodule\..+\.path$' \
+       | while IFS=' ' read key path; do \
+             name="${key#submodule.}"; name="${name%.path}"; \
+             # Point each submodule at its already-present copy in /src rather than
+             # fetching from the configured URL (which may be relative or require
+             # network access). The -c flag overrides the URL transiently without
+             # modifying .gitmodules or .git/config. \
+             git -C /dotfiles -c protocol.file.allow=always -c "submodule.${name}.url=/src/${path}" \
+                 submodule update --init --depth=1 -- "${path}"; \
+         done \
+    && rm -rf /dotfiles/fonts \
+    && echo "${GIT_SHA}" > /dotfiles/.git-sha
+
+
+# ── final ─────────────────────────────────────────────────────────────────────
 FROM ubuntu:24.04
 
 ARG USERNAME=devuser
@@ -44,29 +82,21 @@ RUN echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
 
 # Set bash as the default shell
 RUN chsh -s /usr/bin/bash ${USERNAME}
+ENV SHELL=/usr/bin/bash
 
 # Set the default user for the image, also used in the rest of steps.
 USER $USERNAME
 
 # ── copy repo ─────────────────────────────────────────────────────────────────
-# The build context is the repository root.
-# .dockerignore should exclude build artefacts, secrets, etc.
+# The builder stage produced a shallow clone; .git is small but fetch/merge work.
 WORKDIR /dotfiles
-COPY . .
+COPY --from=builder /dotfiles .
 RUN sudo chown -R ${USERNAME}:${USERNAME} /dotfiles \
-    && git config core.autocrlf input \
-    && git rm --cached -r . \
-    && git reset --hard
-
-# Rewrite the origin remote to the canonical https:// URL so that
-# `git pull` / `git fetch` works from inside a running container.
-# Stamp the exact commit so the image is self-describing at runtime.
-# Only performed when REPO_URL is provided; skipped for local/manual builds.
-RUN if [ -n "${REPO_URL}" ]; then git remote set-url origin "${REPO_URL}"; fi \
-    && echo "${GIT_SHA}" > /dotfiles/.git-sha \
     && echo "${BUILD_DATE}" > /dotfiles/.build-date
 
 # ── install dotfiles ──────────────────────────────────────────────────────────
 RUN python3 /dotfiles/scripts/deploy-dotfiles /dotfiles --apply
+
+WORKDIR /home/${USERNAME}
 
 CMD ["sleep", "infinity"]
