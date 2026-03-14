@@ -20,6 +20,7 @@ RUN echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
 
 # Set bash as the default shell
 RUN chsh -s /usr/bin/bash devuser
+ENV SHELL=/usr/bin/bash
 
 # Install docker CLI
 RUN install -m 0755 -d /etc/apt/keyrings \
