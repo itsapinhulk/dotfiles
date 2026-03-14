@@ -18,11 +18,9 @@
     },
     // Edit predictions
     "edit_predictions": {
+        "provider": "zed",
         "mode": "eager",
         "enabled_in_text_threads": false,
-    },
-    "features": {
-        "edit_prediction_provider": "zed",
     },
 
     "ui_font_size": 24,

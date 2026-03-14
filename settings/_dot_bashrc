@@ -51,6 +51,7 @@ fi
 umask u=rwx,g=rx,o=
 
 export TERM=xterm-256color
+export COLORTERM=truecolor
 
 add-to-path /usr/local/bin
 add-to-path ~/.local/bin

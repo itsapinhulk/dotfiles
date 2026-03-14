@@ -2,22 +2,32 @@
 # Pull the latest commit for every submodule recursively.
 set -euo pipefail
 
-if [[ $# -eq 0 ]]; then
-    echo "Usage: update-git-submodules <target-dir>" >&2
-    echo "  GIT_SUBMODULES_UPDATE_SKIP  colon-separated list of submodule paths to skip" >&2
-    exit 1
-fi
-TARGET="$1"
+TARGET="${1:-.}"
 
+# If set, colon-separated list of submodule paths to process; otherwise process all.
+GIT_SUBMODULES_UPDATE_TARGET="${GIT_SUBMODULES_UPDATE_TARGET:-}"
 # Colon-separated list of submodule paths to skip (e.g. ext/foo:ext/bar)
 GIT_SUBMODULES_UPDATE_SKIP="${GIT_SUBMODULES_UPDATE_SKIP:-}"
-export GIT_SUBMODULES_UPDATE_SKIP
+export GIT_SUBMODULES_UPDATE_TARGET GIT_SUBMODULES_UPDATE_SKIP
 
 _sync_submodule() {
     local IFS=':'
-    local skip
-    for skip in ${GIT_SUBMODULES_UPDATE_SKIP}; do
-        if [[ "$displaypath" == "$skip" ]]; then
+    if [ -n "$GIT_SUBMODULES_UPDATE_TARGET" ]; then
+        local _target _matched=0
+        for _target in ${GIT_SUBMODULES_UPDATE_TARGET}; do
+            if [ "$displaypath" = "$_target" ]; then
+                _matched=1
+                break
+            fi
+        done
+        if [ "$_matched" = 0 ]; then
+            return
+        fi
+    fi
+
+    local _skip
+    for _skip in ${GIT_SUBMODULES_UPDATE_SKIP}; do
+        if [ "$displaypath" = "$_skip" ]; then
             echo "Skipping $displaypath"
             return
         fi

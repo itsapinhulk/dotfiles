@@ -46,3 +46,6 @@ USER $USERNAME
 
 # Install Claude Code
 RUN curl -fsSL https://claude.ai/install.sh | bash
+RUN echo 'export PATH="~/.local/bin:$PATH"' >> /home/$USERNAME/.bashrc
+RUN echo 'export TERM=xterm-256color' >> /home/$USERNAME/.bashrc
+RUN echo 'export COLORTERM=truecolor' >> /home/$USERNAME/.bashrc
