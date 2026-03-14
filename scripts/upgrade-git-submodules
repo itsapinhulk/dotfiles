@@ -25,7 +25,7 @@ _sync_submodule() {
 
     echo "Syncing $displaypath..."
     git fetch origin
-    if git symbolic-ref HEAD &>/dev/null; then
+    if git symbolic-ref HEAD >/dev/null 2>&1; then
         git merge --ff-only FETCH_HEAD
     else
         git checkout FETCH_HEAD
@@ -33,4 +33,5 @@ _sync_submodule() {
 }
 export -f _sync_submodule
 
-git -C "$TARGET" submodule foreach --recursive 'bash -c _sync_submodule'
+git -C "$TARGET" submodule foreach --recursive \
+  "$(declare -f _sync_submodule); _sync_submodule"
