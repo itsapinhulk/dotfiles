@@ -130,6 +130,9 @@ RUN nvim --headless -c "lua vim.defer_fn(function() vim.cmd('qa!') end, 60000)" 
     && rm -rf ~/.local/share/nvim/mason/packages/*/node_modules \
     && rm -rf ~/.local/share/nvim/mason/staging
 
+# ── install claude code ───────────────────────────────────────────────────────
+RUN curl -fsSL https://claude.ai/install.sh | bash
+
 # ── switch default shell to brew bash ─────────────────────────────────────────
 RUN echo "${BREW_BASH}" | sudo tee -a /etc/shells \
     && sudo chsh -s "${BREW_BASH}" ${USERNAME}
