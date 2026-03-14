@@ -3,20 +3,20 @@
 set -euo pipefail
 
 if [[ $# -eq 0 ]]; then
-    echo "Usage: upgrade-git-submodules <target-dir>" >&2
-    echo "  UPGRADE_GIT_SUBMODULES_SKIP  colon-separated list of submodule paths to skip" >&2
+    echo "Usage: update-git-submodules <target-dir>" >&2
+    echo "  GIT_SUBMODULES_UPDATE_SKIP  colon-separated list of submodule paths to skip" >&2
     exit 1
 fi
 TARGET="$1"
 
 # Colon-separated list of submodule paths to skip (e.g. ext/foo:ext/bar)
-UPGRADE_GIT_SUBMODULES_SKIP="${UPGRADE_GIT_SUBMODULES_SKIP:-}"
-export UPGRADE_GIT_SUBMODULES_SKIP
+GIT_SUBMODULES_UPDATE_SKIP="${GIT_SUBMODULES_UPDATE_SKIP:-}"
+export GIT_SUBMODULES_UPDATE_SKIP
 
 _sync_submodule() {
     local IFS=':'
     local skip
-    for skip in ${UPGRADE_GIT_SUBMODULES_SKIP}; do
+    for skip in ${GIT_SUBMODULES_UPDATE_SKIP}; do
         if [[ "$displaypath" == "$skip" ]]; then
             echo "Skipping $displaypath"
             return
