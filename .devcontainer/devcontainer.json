@@ -1,21 +1,21 @@
 {
   "name": "Dotfiles Dev Environment",
-  "runArgs": ["--name", "devct-dotfiles", "--hostname", "devct-dotfiles"],
+  "runArgs": ["--hostname", "devct-dotfiles"],
   "build": {
-    "dockerfile": "Dockerfile",
+    "dockerfile": "Dockerfile"
   },
-  "workspaceFolder": "/repo/dotfiles",
+  "workspaceFolder": "/repo/itsapinhulk/dotfiles",
   "workspaceMount": "source=${localWorkspaceFolder},target=${containerWorkspaceFolder},type=bind",
   "remoteUser": "devuser",
   "containerUser": "devuser",
   // Ensures the container workspace folder is owned by your user
   "updateRemoteUserUID": true,
   "mounts": [
-    "source=claude-code-config,target=/home/devuser/.claude,type=volume",
-     "type=volume,target=${containerWorkspaceFolder}/.jj",
+      "source=claude-code-config,target=/home/devuser/.claude,type=volume",
+      "type=volume,target=${containerWorkspaceFolder}/.jj"
   ],
   "containerEnv": {
-    "CLAUDE_CONFIG_DIR": "/home/devuser/.claude",
+      "CLAUDE_CONFIG_DIR": "/home/devuser/.claude"
   },
-  "updateContentCommand": "sudo chown -R devuser:devuser ${containerWorkspaceFolder} || true",
+  "updateContentCommand": "sudo chown -R devuser:devuser ${containerWorkspaceFolder} || true"
 }
