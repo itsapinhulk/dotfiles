@@ -61,7 +61,9 @@ separate(" ",
 'claude_draft()' = '''
 separate("\n",
   description,
-  "\n\nCo-authored-by: Claude <claude@anthropic.com>",
+  if(!description.contains("Co-authored-by: Claude <claude@anthropic.com>"),
+    "\n\nCo-authored-by: Claude <claude@anthropic.com>",
+  ),
   surround("JJ: Changes:\n", "", indent("JJ: \t", diff.summary()))
 )
 '''

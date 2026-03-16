@@ -11,6 +11,15 @@ BROAD_ALLOW = [
     "Bash(npx *)",
     "Bash(ls *)",
     "Bash(cat *)",
+    "Bash(find *)",
+    "Bash(grep *)",
+    "Bash(python *)",
+    "Bash(python3 *)",
+    "Bash(pytest *)",
+    "Bash(sh *)",
+    "Bash(bash *)",
+    "Bash(./*.sh)",
+    "Bash(*.sh)",
 ]
 
 DEFAULT_SETTINGS_PATH = Path.home() / ".claude" / "settings.json"
