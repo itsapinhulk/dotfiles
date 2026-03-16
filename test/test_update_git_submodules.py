@@ -348,11 +348,11 @@ class TestUpdateGitSubmodules(unittest.TestCase):
         self.assertEqual(_git("rev-parse", "HEAD", cwd=parent / "sub"), new_commit)
 
     # ------------------------------------------------------------------
-    # Recursive submodules
+    # Non-recursive: nested submodules are not touched
     # ------------------------------------------------------------------
 
-    def test_recursive_nested_submodule_updated(self) -> None:
-        """Nested submodules are updated recursively."""
+    def test_nested_submodule_not_updated(self) -> None:
+        """The script only updates direct submodules; grandchild submodules are not touched."""
         # Build: grandchild_origin → child_origin (has grandchild as submodule) → parent
         grandchild_origin = self.tmp / "origin_grandchild"
         _make_origin_repo(grandchild_origin)
@@ -367,14 +367,17 @@ class TestUpdateGitSubmodules(unittest.TestCase):
         _git("submodule", "update", "--init", "--recursive", cwd=parent)
         _git("commit", "-m", "add child submodule", cwd=parent)
 
+        grandchild_path = parent / "child" / "grandchild"
+        before = _git("rev-parse", "HEAD", cwd=grandchild_path)
+
         # Push a new commit to grandchild_origin.
-        new_commit = _make_commit(grandchild_origin, content="v2")
+        _make_commit(grandchild_origin, content="v2")
 
         result = _run_script(parent)
 
         self.assertEqual(result.returncode, 0, result.stderr)
-        grandchild_path = parent / "child" / "grandchild"
-        self.assertEqual(_git("rev-parse", "HEAD", cwd=grandchild_path), new_commit)
+        # Grandchild must remain at its original commit — not updated.
+        self.assertEqual(_git("rev-parse", "HEAD", cwd=grandchild_path), before)
 
 
 if __name__ == "__main__":

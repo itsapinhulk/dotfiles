@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Pull the latest commit for every submodule recursively.
+# Pull the latest commit for every submodule.
 set -euo pipefail
 
 TARGET="${1:-.}"
@@ -43,5 +43,5 @@ _sync_submodule() {
 }
 export -f _sync_submodule
 
-git -C "$TARGET" submodule foreach --recursive \
+git -C "$TARGET" submodule foreach \
   "$(declare -f _sync_submodule); _sync_submodule"
