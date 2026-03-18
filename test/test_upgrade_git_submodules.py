@@ -87,7 +87,7 @@ def _run_script(
     target: Path,
     extra_env: dict[str, str] | None = None,
 ) -> subprocess.CompletedProcess:
-    """Invoke update-git-submodules with *target* as the positional argument."""
+    """Invoke upgrade-git-submodules with *target* as the positional argument."""
     env = {**_GIT_ENV_BASE, **(extra_env or {})}
     return subprocess.run(
         ["bash", str(SCRIPT_PATH), str(target)],
@@ -129,7 +129,7 @@ def _setup_parent_with_submodules(
 # Tests
 # ---------------------------------------------------------------------------
 
-class TestUpdateGitSubmodules(unittest.TestCase):
+class TestUpgradeGitSubmodules(unittest.TestCase):
 
     def setUp(self) -> None:
         self._tmpdir = tempfile.TemporaryDirectory()

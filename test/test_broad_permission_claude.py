@@ -54,25 +54,25 @@ class TestApplyBroadPermissions(unittest.TestCase):
     def test_sets_auto_accept_edits(self):
         p = write_settings(self.tmp_path, {})
         result = apply_broad_permissions(p)
-        assert result["defaultMode"] == "acceptEdits"
+        assert result["permissions"]["defaultMode"] == "acceptEdits"
 
     def test_overwrites_auto_accept_edits_if_false(self):
         p = write_settings(self.tmp_path, {"autoAcceptEdits": False})
         result = apply_broad_permissions(p)
-        assert result["defaultMode"] == "acceptEdits"
+        assert result["permissions"]["defaultMode"] == "acceptEdits"
 
     def test_missing_file_uses_empty_settings(self):
         p = self.tmp_path / "nonexistent.json"
         result = apply_broad_permissions(p)
         self.assertEqual(result["permissions"]["allow"], BROAD_ALLOW)
-        self.assertEqual(result["defaultMode"], "acceptEdits")
+        self.assertEqual(result["permissions"]["defaultMode"], "acceptEdits")
 
     def test_empty_file_uses_empty_settings(self):
         p = self.tmp_path / "settings.json"
         p.write_text("")
         result = apply_broad_permissions(p)
         self.assertEqual(result["permissions"]["allow"], BROAD_ALLOW)
-        self.assertEqual(result["defaultMode"], "acceptEdits")
+        self.assertEqual(result["permissions"]["defaultMode"], "acceptEdits")
 
     def test_broad_allow_contents(self):
         self.assertIn("Bash(git *)", BROAD_ALLOW)
