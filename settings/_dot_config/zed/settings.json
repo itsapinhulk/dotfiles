@@ -17,6 +17,7 @@
         }
     },
     "agent": {
+        "limit_content_width": false,
         "dock": "bottom",
         "default_height": 640,
     },
