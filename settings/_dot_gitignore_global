@@ -1,8 +1,11 @@
-/.idea/
-/.vscode/
-/.zed/
-/.envrc
+# Configuration directories which are always local specific
+.idea/
+.vscode/
+.zed/
+.envrc
+.claude/
 
+# Temporary files
 *.swp
 *.pyc
 
