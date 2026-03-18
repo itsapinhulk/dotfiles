@@ -5,16 +5,16 @@ set -euo pipefail
 TARGET="${1:-.}"
 
 # If set, colon-separated list of submodule paths to process; otherwise process all.
-GIT_SUBMODULES_UPDATE_TARGET="${GIT_SUBMODULES_UPDATE_TARGET:-}"
+GIT_SUBMODULES_UPGRADE_TARGET="${GIT_SUBMODULES_UPGRADE_TARGET:-}"
 # Colon-separated list of submodule paths to skip (e.g. ext/foo:ext/bar)
-GIT_SUBMODULES_UPDATE_SKIP="${GIT_SUBMODULES_UPDATE_SKIP:-}"
-export GIT_SUBMODULES_UPDATE_TARGET GIT_SUBMODULES_UPDATE_SKIP
+GIT_SUBMODULES_UPGRADE_SKIP="${GIT_SUBMODULES_UPGRADE_SKIP:-}"
+export GIT_SUBMODULES_UPGRADE_TARGET GIT_SUBMODULES_UPGRADE_SKIP
 
 _sync_submodule() {
     local IFS=':'
-    if [ -n "$GIT_SUBMODULES_UPDATE_TARGET" ]; then
+    if [ -n "$GIT_SUBMODULES_UPGRADE_TARGET" ]; then
         local _target _matched=0
-        for _target in ${GIT_SUBMODULES_UPDATE_TARGET}; do
+        for _target in ${GIT_SUBMODULES_UPGRADE_TARGET}; do
             if [ "$displaypath" = "$_target" ]; then
                 _matched=1
                 break
@@ -26,7 +26,7 @@ _sync_submodule() {
     fi
 
     local _skip
-    for _skip in ${GIT_SUBMODULES_UPDATE_SKIP}; do
+    for _skip in ${GIT_SUBMODULES_UPGRADE_SKIP}; do
         if [ "$displaypath" = "$_skip" ]; then
             echo "Skipping $displaypath"
             return

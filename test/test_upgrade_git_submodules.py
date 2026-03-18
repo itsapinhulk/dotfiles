@@ -1,8 +1,8 @@
 """
-test_update_git_submodules.py — unittest test suite for update-git-submodules.
+test_upgrade_git_submodules.py — unittest test suite for upgrade-git-submodules.
 
 Run with:
-    python test/test_update_git_submodules.py
+    python test/test_upgrade_git_submodules.py
 
 All tests use local-only git repositories in temporary directories — no network
 access is required.
@@ -17,7 +17,7 @@ import unittest
 from pathlib import Path
 
 
-SCRIPT_PATH = Path(__file__).parent.parent / "scripts" / "update-git-submodules"
+SCRIPT_PATH = Path(__file__).parent.parent / "scripts" / "upgrade-git-submodules"
 
 # Minimal git environment: override identity so commits work without a global
 # ~/.gitconfig, suppress system-level config, and allow file:// transport so
@@ -208,27 +208,27 @@ class TestUpdateGitSubmodules(unittest.TestCase):
         self.assertIn("Syncing sub...", result.stdout)
 
     def test_skipping_message_printed(self) -> None:
-        """'Skipping <name>' is printed for submodules in GIT_SUBMODULES_UPDATE_SKIP."""
+        """'Skipping <name>' is printed for submodules in GIT_SUBMODULES_UPGRADE_SKIP."""
         parent, origins = _setup_parent_with_submodules(self.tmp)
         _make_commit(origins["sub"], content="v2")
 
-        result = _run_script(parent, extra_env={"GIT_SUBMODULES_UPDATE_SKIP": "sub"})
+        result = _run_script(parent, extra_env={"GIT_SUBMODULES_UPGRADE_SKIP": "sub"})
 
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("Skipping sub", result.stdout)
 
     # ------------------------------------------------------------------
-    # GIT_SUBMODULES_UPDATE_TARGET
+    # GIT_SUBMODULES_UPGRADE_TARGET
     # ------------------------------------------------------------------
 
     def test_target_env_only_updates_named_submodule(self) -> None:
-        """GIT_SUBMODULES_UPDATE_TARGET restricts updates to a single submodule."""
+        """GIT_SUBMODULES_UPGRADE_TARGET restricts updates to a single submodule."""
         parent, origins = _setup_parent_with_submodules(self.tmp, ("sub1", "sub2"))
         orig1 = _git("rev-parse", "HEAD", cwd=parent / "sub1")
         _make_commit(origins["sub1"], content="v2")
         commit2 = _make_commit(origins["sub2"], content="v2")
 
-        result = _run_script(parent, extra_env={"GIT_SUBMODULES_UPDATE_TARGET": "sub2"})
+        result = _run_script(parent, extra_env={"GIT_SUBMODULES_UPGRADE_TARGET": "sub2"})
 
         self.assertEqual(result.returncode, 0, result.stderr)
         # sub2 updated; sub1 untouched.
@@ -236,14 +236,14 @@ class TestUpdateGitSubmodules(unittest.TestCase):
         self.assertEqual(_git("rev-parse", "HEAD", cwd=parent / "sub1"), orig1)
 
     def test_target_env_colon_separated_updates_multiple(self) -> None:
-        """Colon-separated GIT_SUBMODULES_UPDATE_TARGET updates only the listed submodules."""
+        """Colon-separated GIT_SUBMODULES_UPGRADE_TARGET updates only the listed submodules."""
         parent, origins = _setup_parent_with_submodules(self.tmp, ("sub1", "sub2", "sub3"))
         orig3 = _git("rev-parse", "HEAD", cwd=parent / "sub3")
         commit1 = _make_commit(origins["sub1"], content="v2")
         commit2 = _make_commit(origins["sub2"], content="v2")
         _make_commit(origins["sub3"], content="v2")
 
-        result = _run_script(parent, extra_env={"GIT_SUBMODULES_UPDATE_TARGET": "sub1:sub2"})
+        result = _run_script(parent, extra_env={"GIT_SUBMODULES_UPGRADE_TARGET": "sub1:sub2"})
 
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(_git("rev-parse", "HEAD", cwd=parent / "sub1"), commit1)
@@ -251,35 +251,35 @@ class TestUpdateGitSubmodules(unittest.TestCase):
         self.assertEqual(_git("rev-parse", "HEAD", cwd=parent / "sub3"), orig3)
 
     def test_target_env_nonexistent_name_updates_nothing(self) -> None:
-        """GIT_SUBMODULES_UPDATE_TARGET set to an unknown name leaves all submodules unchanged."""
+        """GIT_SUBMODULES_UPGRADE_TARGET set to an unknown name leaves all submodules unchanged."""
         parent, origins = _setup_parent_with_submodules(self.tmp)
         orig = _git("rev-parse", "HEAD", cwd=parent / "sub")
         _make_commit(origins["sub"], content="v2")
 
-        result = _run_script(parent, extra_env={"GIT_SUBMODULES_UPDATE_TARGET": "nonexistent"})
+        result = _run_script(parent, extra_env={"GIT_SUBMODULES_UPGRADE_TARGET": "nonexistent"})
 
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(_git("rev-parse", "HEAD", cwd=parent / "sub"), orig)
 
     # ------------------------------------------------------------------
-    # GIT_SUBMODULES_UPDATE_SKIP
+    # GIT_SUBMODULES_UPGRADE_SKIP
     # ------------------------------------------------------------------
 
     def test_skip_env_single_submodule_not_updated(self) -> None:
-        """A submodule listed in GIT_SUBMODULES_UPDATE_SKIP is not updated."""
+        """A submodule listed in GIT_SUBMODULES_UPGRADE_SKIP is not updated."""
         parent, origins = _setup_parent_with_submodules(self.tmp, ("sub1", "sub2"))
         orig1 = _git("rev-parse", "HEAD", cwd=parent / "sub1")
         _make_commit(origins["sub1"], content="v2")
         commit2 = _make_commit(origins["sub2"], content="v2")
 
-        result = _run_script(parent, extra_env={"GIT_SUBMODULES_UPDATE_SKIP": "sub1"})
+        result = _run_script(parent, extra_env={"GIT_SUBMODULES_UPGRADE_SKIP": "sub1"})
 
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(_git("rev-parse", "HEAD", cwd=parent / "sub2"), commit2)
         self.assertEqual(_git("rev-parse", "HEAD", cwd=parent / "sub1"), orig1)
 
     def test_skip_env_colon_separated_skips_multiple(self) -> None:
-        """Colon-separated GIT_SUBMODULES_UPDATE_SKIP skips all listed submodules."""
+        """Colon-separated GIT_SUBMODULES_UPGRADE_SKIP skips all listed submodules."""
         parent, origins = _setup_parent_with_submodules(self.tmp, ("sub1", "sub2", "sub3"))
         orig1 = _git("rev-parse", "HEAD", cwd=parent / "sub1")
         orig2 = _git("rev-parse", "HEAD", cwd=parent / "sub2")
@@ -287,7 +287,7 @@ class TestUpdateGitSubmodules(unittest.TestCase):
         _make_commit(origins["sub2"], content="v2")
         commit3 = _make_commit(origins["sub3"], content="v2")
 
-        result = _run_script(parent, extra_env={"GIT_SUBMODULES_UPDATE_SKIP": "sub1:sub2"})
+        result = _run_script(parent, extra_env={"GIT_SUBMODULES_UPGRADE_SKIP": "sub1:sub2"})
 
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(_git("rev-parse", "HEAD", cwd=parent / "sub3"), commit3)

@@ -50,7 +50,7 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Run update-git-submodules tests
+      - name: Run upgrade-git-submodules tests
         run: python3 test/run_tests.py
 
   build-and-push:
