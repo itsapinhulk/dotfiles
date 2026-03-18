@@ -29,7 +29,7 @@ def apply_broad_permissions(settings_path: Path) -> dict:
     text = settings_path.read_text() if settings_path.exists() else ""
     settings = json.loads(text) if text.strip() else {}
     settings.setdefault("permissions", {})["allow"] = BROAD_ALLOW
-    settings["defaultMode"] = "acceptEdits"
+    settings.setdefault("permissions", {})["defaultMode"] = "acceptEdits"
     return settings
 
 
