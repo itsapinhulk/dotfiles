@@ -60,10 +60,10 @@ separate(" ",
 # draft_commit_description = 'claude_draft()'
 'claude_draft()' = '''
 separate("\n",
-  description,
   if(!description.contains("Co-authored-by: Claude <claude@anthropic.com>"),
-    "\n\nCo-authored-by: Claude <claude@anthropic.com>",
+    "JJ: Co-authored-by: Claude <claude@anthropic.com>\n",
   ),
+  description,
   surround("JJ: Changes:\n", "", indent("JJ: \t", diff.summary()))
 )
 '''
