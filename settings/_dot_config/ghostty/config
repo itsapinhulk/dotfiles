@@ -36,3 +36,7 @@ palette = 12=#0092ff
 palette = 13=#9a5feb
 palette = 14=#67fff0
 palette = 15=#ffffff
+
+# Easier copy to clipboard
+keybind = cmd+shift+c=copy_to_clipboard
+keybind = performable:ctrl+c=copy_to_clipboard
