@@ -11,12 +11,15 @@ preview the changes without `--apply`, and supports `--verbose` to print out eve
 
 Either `deploy-dotfiles <repo> [--skip path] [--apply]`
 
-Or, if you are maintaining your own dotfiles and this one is a submodule, you can either call
+Or, if you are maintaining your own dotfiles and this one is a submodule, you can call
 
 `deploy-dotfiles <main-repo> <fallback-repo> ... [--apply]`
 
-The repo also includes a `sync-dotfiles` script which calls the above, and can be further customized by
+or, the repo also includes a `sync-dotfiles` script which calls the above, and can be further customized by
 setting `DOTFILES_SYNC_REPOS` and `DOTFILES_SYNC_SKIP`.
+
+If you are going to be a passive consumer of this repo, it is recommended that you include it as a submodule in your own personal dotfiles.
+If you are going to be an active user of this repo, contributing changes, you should clone it in a directory alongside your personal dotfiles.
 
 ## Manual Setup
 
