@@ -24,7 +24,7 @@ If you are going to be an active user of this repo, contributing changes, you sh
 ## Manual Setup
 
 ### Fonts
-Install any font in `fonts/` (using `./scripts/install-dotfiles-font` on Linux)
+Install the font in `fonts/`, it is default throughout these settings
 
 ### Homebrew
 
