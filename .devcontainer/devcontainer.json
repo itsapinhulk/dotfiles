@@ -2,7 +2,10 @@
   "name": "Dotfiles Dev Environment",
   "runArgs": ["--hostname", "devct-dotfiles"],
   "build": {
-    "dockerfile": "Dockerfile"
+    "dockerfile": "Dockerfile",
+    "args": {
+      "USER_UID": "${localEnv:UID}"
+    }
   },
   "workspaceFolder": "/repo/itsapinhulk/dotfiles",
   "workspaceMount": "source=${localWorkspaceFolder},target=${containerWorkspaceFolder},type=bind",
