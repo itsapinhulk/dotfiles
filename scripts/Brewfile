@@ -25,4 +25,4 @@ brew "tmuxp"
 brew "uv"
 brew "wget"
 brew "zip"
-
+brew "oven-sh/bun/bun", tap: "oven-sh/bun"
