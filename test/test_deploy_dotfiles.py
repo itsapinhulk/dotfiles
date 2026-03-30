@@ -945,5 +945,147 @@ class TestMultiRepoPriority(unittest.TestCase):
         self.assertEqual((self.home / ".bashrc").read_text(), "base")
 
 
+# ---------------------------------------------------------------------------
+# Tests for --whole-dir / extra_whole_dirs
+# ---------------------------------------------------------------------------
+
+class TestExtraWholeDirs(unittest.TestCase):
+
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp())
+        self.home = self.tmp / "home"
+        self.home.mkdir()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp)
+
+    def _make_ctx_with_whole_dirs(self, whole_dirs: frozenset) -> DeployContext:
+        return DeployContext(
+            target_root=self.home,
+            backup_root=None,
+            dry_run=False,
+            verbose=False,
+            extra_whole_dirs=whole_dirs,
+        )
+
+    def test_whole_dir_symlinked_as_unit(self):
+        """A dir listed in extra_whole_dirs is symlinked whole, not recursed into."""
+        if not _can_symlink():
+            self.skipTest("Symlinks not available on this platform")
+        repo = make_test_repo(self.tmp, "repo", {
+            "_dot_config/myapp/init.conf": "conf",
+            "_dot_config/myapp/extra.conf": "extra",
+        })
+        ctx = self._make_ctx_with_whole_dirs(frozenset({".config/myapp"}))
+        deploy_repos_with_priority(ctx, [repo])
+        dst = self.home / ".config" / "myapp"
+        self.assertTrue(dst.is_symlink())
+        src = repo / "settings" / "_dot_config" / "myapp"
+        self.assertEqual(dst.resolve(), src.resolve())
+
+    def test_whole_dir_takes_priority_over_recursion(self):
+        """extra_whole_dirs stops recursion even when the dir has many children."""
+        if not _can_symlink():
+            self.skipTest("Symlinks not available on this platform")
+        repo = make_test_repo(self.tmp, "repo", {
+            "_dot_local/share/app/a": "a",
+            "_dot_local/share/app/b": "b",
+            "_dot_local/share/app/sub/c": "c",
+        })
+        ctx = self._make_ctx_with_whole_dirs(frozenset({".local/share/app"}))
+        deploy_repos_with_priority(ctx, [repo])
+        dst = self.home / ".local" / "share" / "app"
+        self.assertTrue(dst.is_symlink())
+
+    def test_extra_whole_dirs_does_not_affect_other_dirs(self):
+        """Dirs not in extra_whole_dirs are still recursed normally."""
+        if not _can_symlink():
+            self.skipTest("Symlinks not available on this platform")
+        repo = make_test_repo(self.tmp, "repo", {
+            "_dot_config/myapp/init.conf": "conf",
+            "_dot_config/otherapp/init.conf": "other",
+        })
+        ctx = self._make_ctx_with_whole_dirs(frozenset({".config/myapp"}))
+        deploy_repos_with_priority(ctx, [repo])
+        # myapp whole-symlinked
+        self.assertTrue((self.home / ".config" / "myapp").is_symlink())
+        # otherapp recursed — its file is the symlink, not the dir
+        self.assertFalse((self.home / ".config" / "otherapp").is_symlink())
+        self.assertTrue((self.home / ".config" / "otherapp" / "init.conf").is_symlink())
+
+    def test_main_whole_dir_flag(self):
+        """--whole-dir CLI flag causes the directory to be symlinked as a whole."""
+        if not _can_symlink():
+            self.skipTest("Symlinks not available on this platform")
+        repo = make_test_repo(self.tmp, "repo", {
+            "_dot_config/myapp/init.conf": "conf",
+        })
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            result = main([
+                str(repo),
+                "--target", str(self.home),
+                "--whole-dir", ".config/myapp",
+                "--apply",
+            ])
+        self.assertEqual(result, 0)
+        dst = self.home / ".config" / "myapp"
+        self.assertTrue(dst.is_symlink())
+
+    def test_main_multiple_whole_dir_flags(self):
+        """Multiple --whole-dir flags are all respected."""
+        if not _can_symlink():
+            self.skipTest("Symlinks not available on this platform")
+        repo = make_test_repo(self.tmp, "repo", {
+            "_dot_config/app1/conf": "a",
+            "_dot_config/app2/conf": "b",
+        })
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            result = main([
+                str(repo),
+                "--target", str(self.home),
+                "--whole-dir", ".config/app1",
+                "--whole-dir", ".config/app2",
+                "--apply",
+            ])
+        self.assertEqual(result, 0)
+        self.assertTrue((self.home / ".config" / "app1").is_symlink())
+        self.assertTrue((self.home / ".config" / "app2").is_symlink())
+
+    def test_main_whole_dir_trailing_slash_ignored(self):
+        """--whole-dir with a trailing slash matches correctly."""
+        if not _can_symlink():
+            self.skipTest("Symlinks not available on this platform")
+        repo = make_test_repo(self.tmp, "repo", {
+            "_dot_config/myapp/init.conf": "conf",
+        })
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            result = main([
+                str(repo),
+                "--target", str(self.home),
+                "--whole-dir", ".config/myapp/",
+                "--apply",
+            ])
+        self.assertEqual(result, 0)
+        self.assertTrue((self.home / ".config" / "myapp").is_symlink())
+
+    def test_main_dry_run_whole_dir_creates_nothing(self):
+        """--whole-dir in dry-run mode prints intent but creates no symlink."""
+        repo = make_test_repo(self.tmp, "repo", {
+            "_dot_config/myapp/init.conf": "conf",
+        })
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            result = main([
+                str(repo),
+                "--target", str(self.home),
+                "--whole-dir", ".config/myapp",
+            ])
+        self.assertEqual(result, 0)
+        self.assertFalse((self.home / ".config" / "myapp").exists())
+
+
 if __name__ == "__main__":
     unittest.main()

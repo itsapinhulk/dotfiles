@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Sync dotfiles repos to home directory.
-#   DOTFILES_SYNC_REPOS  colon-separated list of repo paths (default: this repo)
-#   DOTFILES_SYNC_SKIP   colon-separated list of target paths to skip
+#   DOTFILES_SYNC_REPOS       colon-separated list of repo paths (default: this repo)
+#   DOTFILES_SYNC_SKIP        colon-separated list of target paths to skip
+#   DOTFILES_SYNC_WHOLE_DIRS  colon-separated list of target paths to symlink as whole dirs
 set -euo pipefail
 
 _SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -16,8 +17,16 @@ if [[ -n "${DOTFILES_SYNC_SKIP:-}" ]]; then
     done
 fi
 
-echo "Customize sync-dotfiles behavior by setting DOTFILES_SYNC_REPOS / DOTFILES_SYNC_SKIP env vars."
+whole_dir_args=()
+if [[ -n "${DOTFILES_SYNC_WHOLE_DIRS:-}" ]]; then
+    IFS=':' read -ra whole_dirs <<< "$DOTFILES_SYNC_WHOLE_DIRS"
+    for d in "${whole_dirs[@]}"; do
+        whole_dir_args+=(--whole-dir "$d")
+    done
+fi
+
+echo "Customize sync-dotfiles behavior by setting DOTFILES_SYNC_REPOS / DOTFILES_SYNC_SKIP / DOTFILES_SYNC_WHOLE_DIRS env vars."
 (
     set -x
-    exec deploy-dotfiles "${repos[@]}" "${skip_args[@]}" "$@"
+    exec deploy-dotfiles "${repos[@]}" "${skip_args[@]}" "${whole_dir_args[@]}" "$@"
 )

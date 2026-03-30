@@ -21,6 +21,7 @@ Usage
     -v, --verbose         Print every decision
     --apply               Actually apply changes (default is a dry-run)
     --skip PATH           Skip a translated target path (repeat for multiple)
+    --whole-dir PATH      Symlink PATH as a whole dir instead of recursing (repeat for multiple)
 """
 
 from __future__ import annotations
@@ -300,12 +301,14 @@ class DeployContext:
         dry_run: bool,
         verbose: bool,
         skip_paths: frozenset[str] = frozenset(),
+        extra_whole_dirs: frozenset[str] = frozenset(),
     ) -> None:
         self.target_root = target_root
         self.backup_root = backup_root
         self.dry_run = dry_run
         self.verbose = verbose
         self.skip_paths = skip_paths  # translated POSIX subpaths to skip
+        self.extra_whole_dirs = extra_whole_dirs  # additional dirs to symlink whole
         # Path is computed eagerly so it can be displayed up front; the
         # directory itself is created lazily (only when a backup is needed).
         if backup_root is not None:
@@ -399,7 +402,7 @@ def deploy_entry(ctx: DeployContext, src: Path, subpath: Path) -> None:
         return
 
     # 2. Directories: recurse unless the whole dir should be symlinked.
-    if src.is_dir() and translated_key not in SYMLINK_WHOLE_DIRS:
+    if src.is_dir() and translated_key not in SYMLINK_WHOLE_DIRS and translated_key not in ctx.extra_whole_dirs:
         for child in sorted(src.iterdir()):
             deploy_entry(ctx, child, subpath / child.name)
         return
@@ -409,11 +412,12 @@ def deploy_entry(ctx: DeployContext, src: Path, subpath: Path) -> None:
 
 
 
-def _collect_leaf_subpaths(root: Path) -> list[Path]:
+def _collect_leaf_subpaths(root: Path, ctx: "DeployContext | None" = None) -> list[Path]:
     """
     Walk the settings directory and return leaf subpaths — the paths that
     will actually be deployed (files, whole-dir symlinks, and special paths).
     """
+    extra_whole_dirs = ctx.extra_whole_dirs if ctx is not None else frozenset()
     results: list[Path] = []
 
     def _walk(src: Path, prefix: Path) -> None:
@@ -424,6 +428,7 @@ def _collect_leaf_subpaths(root: Path) -> list[Path]:
             is_leaf = (
                 child.is_file()
                 or translated_key in SYMLINK_WHOLE_DIRS
+                or translated_key in extra_whole_dirs
                 or translated_key in SPECIAL_HANDLERS
             )
             if is_leaf:
@@ -450,7 +455,7 @@ def deploy_repos_with_priority(ctx: DeployContext, repos: list[Path]) -> None:
             continue
         print(f"{'[repo]':<{_LABEL_WIDTH}} {repo}  (settings root: {root.relative_to(repo)}/)")
 
-        for subpath in _collect_leaf_subpaths(root):
+        for subpath in _collect_leaf_subpaths(root, ctx):
             key = subpath_to_target(subpath).as_posix()
             if key in seen:
                 ctx.log(f"  {'[priority-skip]':<{_LABEL_WIDTH}} {key} already provided by an earlier repo")
@@ -507,6 +512,14 @@ def build_parser() -> argparse.ArgumentParser:
             "Repeat to skip multiple paths."
         ),
     )
+    p.add_argument(
+        "--whole-dir", metavar="PATH", action="append", default=[],
+        dest="whole_dirs",
+        help=(
+            "Translated target subpath to symlink as a whole directory instead of "
+            "recursing into it (e.g. .config/nvim/lua). Repeat for multiple paths."
+        ),
+    )
     return p
 
 
@@ -529,7 +542,8 @@ def main(argv: list[str] | None = None) -> int:
     if dry_run:
         print(f"{'[dry-run]':<{_LABEL_WIDTH}} No changes will be made. Pass --apply to apply.\n")
 
-    skip_paths = frozenset(args.skip)
+    skip_paths = frozenset(Path(s).as_posix() for s in args.skip)
+    extra_whole_dirs = frozenset(Path(d).as_posix() for d in args.whole_dirs)
 
     ctx = DeployContext(
         target_root=target_root,
@@ -537,6 +551,7 @@ def main(argv: list[str] | None = None) -> int:
         dry_run=dry_run,
         verbose=args.verbose,
         skip_paths=skip_paths,
+        extra_whole_dirs=extra_whole_dirs,
     )
     if ctx.run_backup_dir is not None:
         print(f"{'[backup-dir]':<{_LABEL_WIDTH}} {ctx.run_backup_dir}")
