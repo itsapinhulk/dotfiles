@@ -14,3 +14,7 @@ compile_commands.json
 # For MacOS
 .DS_Store
 **/.DS_Store
+
+# Devcontainer files / directories should be local only
+.devcontainer
+.devcontainer/
