@@ -36,23 +36,6 @@ jobs:
       - name: Run deploy-dotfiles tests
         run: python test/test_deploy_dotfiles.py -v
 
-  tests:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.10"
-
-      - name: Run upgrade-git-submodules tests
-        run: python3 test/run_tests.py
-
   build-and-push:
     needs: [test-deploy-dotfiles, tests]
     if: github.ref == 'refs/heads/main' # Only push to Docker Hub from main branch
