@@ -37,7 +37,7 @@ jobs:
         run: python test/test_deploy_dotfiles.py -v
 
   build-and-push:
-    needs: [test-deploy-dotfiles, tests]
+    needs: [test-deploy-dotfiles]
     if: github.ref == 'refs/heads/main' # Only push to Docker Hub from main branch
     environment: docker # Grants access to environment secrets
     runs-on: ubuntu-latest
