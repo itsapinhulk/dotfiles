@@ -20,6 +20,6 @@ jobs:
           submodules: recursive
           fetch-depth: 1
 
-      - uses: itsapinhulk/git-submodules-upgrade@v1
+      - uses: itsapinhulk/git-submodules-upgrade@v2
         with:
          reviewer: itsapinhulk
