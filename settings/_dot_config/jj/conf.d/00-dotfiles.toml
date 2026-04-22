@@ -3,7 +3,7 @@
 [ui]
 editor = "nvim"
 diff-formatter = ":git"
-default-command = ["log", "-n", "20"]
+default-command = ["log"]
 diff-editor = ":builtin"
 # diff-editor = ["nvim", "-c", "DiffEditor $left $right $output"]
 
@@ -79,8 +79,8 @@ separate("\n",
 builtin_immutable_heads() | (trunk()..remote_bookmarks()) | (trunk().. & ~mine())
 """
 
-# All visible heads by current author, including from remote
-"my_heads()" = "visible_heads() & mine() & ~untracked_remote_bookmarks()"
+# All visible heads by current author, including from remote and local bookmarks
+"my_heads()" = "visible_heads() & mine() & ~untracked_remote_bookmarks() | bookmarks()"
 
 "_add_log_context(x)" = "ancestors(present(x), 2)"
 # The following changes will be shown by default for the `log` command
@@ -96,7 +96,8 @@ builtin_immutable_heads() | (trunk()..remote_bookmarks()) | (trunk().. & ~mine()
 """
 
 # For all the above we add one more commit for context.
-"default_log()" = "_add_log_context(default_log_())"
+# Always include my_heads() so branch tips aren't truncated by the 10-commit cap.
+"default_log()" = "_add_log_context(my_heads() | latest(default_log_(), 10))"
 
 # Intended to show everything which might be relevant because it after the trunk change
 "more_log_()" = """
