@@ -10,6 +10,7 @@
     "project_panel": {
         "dock": "left"
     },
+    "bottom_dock_layout": "full",
     "agent_servers": {
         "claude-acp": {
             "type": "registry"
