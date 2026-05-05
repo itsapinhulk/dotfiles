@@ -2,7 +2,7 @@
 #
 # Devcontainer image which includes basic linux tools and configuration from this dotfiles repo.
 #
-# Build args injected by build-and-push.sh:
+# Build args injected by ext/itsapinhulk/shellutils/bash/build-push-docker:
 #   USERNAME   – username for the image and default user
 #   REPO_URL   – https:// URL of the origin remote
 #   GIT_SHA    – full commit SHA baked into the image
