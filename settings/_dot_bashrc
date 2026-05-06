@@ -118,7 +118,7 @@ if command -v _comp__split_longopt &> /dev/null; then
 fi
 
 if command -v jj &> /dev/null; then
-  source <(jj util completion bash)
+  source <(COMPLETE=bash jj)
 fi
 
 # Set default editor
