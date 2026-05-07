@@ -4,6 +4,7 @@
 .zed/
 .envrc
 .claude/
+.venv/
 
 # Temporary files
 *.swp
