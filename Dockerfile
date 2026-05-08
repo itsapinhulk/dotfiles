@@ -22,7 +22,6 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         git git-lfs \
         ca-certificates \
-        libicu74 \
     && \
     rm -rf /var/lib/apt/lists/*
 
@@ -79,6 +78,7 @@ RUN apt-get update && \
         procps \
         python3 \
         sudo \
+        libicu74 \
     && rm -rf /var/lib/apt/lists/*
 
 # ── user ───────────────────────────────────────────────────────────────────────
