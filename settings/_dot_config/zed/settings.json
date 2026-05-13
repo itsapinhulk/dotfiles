@@ -17,7 +17,8 @@
         }
     },
     "agent": {
-        "limit_content_width": false,
+        "limit_content_width": true,
+        "max_content_width": 3000.0,
         "dock": "bottom",
         "default_height": 640,
     },
@@ -25,7 +26,6 @@
     "edit_predictions": {
         "provider": "zed",
         "mode": "eager",
-        "enabled_in_text_threads": false,
     },
 
     "ui_font_size": 24,
