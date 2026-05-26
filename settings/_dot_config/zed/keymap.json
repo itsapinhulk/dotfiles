@@ -82,4 +82,11 @@
             "enter": "editor::ConfirmCompletion",
         },
     },
+    {
+        "context": "MessageEditor > Editor",
+        "bindings": {
+            "enter": "agent::Chat",
+            "shift-enter": "editor::Newline",
+        },
+    },
 ]
