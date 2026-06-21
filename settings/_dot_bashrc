@@ -24,6 +24,7 @@ export XDG_DATA_HOME=$HOME/.local/share
 export XDG_STATE_HOME=$HOME/.local/state
 
 export FIGNORE=$FIGNORE:DS_Store
+export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
 
 _BASHRC_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 
@@ -35,7 +36,6 @@ fi
 alias ll="ls -ltr"
 alias la="ls -altr"
 alias lh="ls -altrh"
-alias pg="ag --skip-vcs-ignores --hidden"
 
 if which --version &> /dev/null; then
     # only create alias for supported which variants
