@@ -595,6 +595,16 @@ class TestGitconfigHandler(unittest.TestCase):
         text = (self.home / ".gitconfig").read_text()
         self.assertFalse(text.startswith("\n"), f"file starts with blank line: {text!r}")
 
+    def test_gitconfig_existing_symlink_left_in_place(self):
+        """An existing symlink to the dotfiles gitconfig is accepted, not replaced."""
+        repo = make_test_repo(self.tmp, "repo", {"_dot_gitconfig": "[user]\n  name = Test\n"})
+        src = repo / "settings" / "_dot_gitconfig"
+        gitconfig = self.home / ".gitconfig"
+        gitconfig.symlink_to(src)
+        deploy_repos_with_priority(_make_ctx(self.home), [repo])
+        self.assertTrue(gitconfig.is_symlink())
+        self.assertEqual(Path(os.readlink(gitconfig)).resolve(), src.resolve())
+
 
 # ---------------------------------------------------------------------------
 # Tests for .config/conda/condarc special handler
