@@ -9,7 +9,6 @@ fi
 _target_brewfile="${DOTFILES_BREWFILE:-$SCRIPT_DIR/Brewfile}"
 
 set -x
-brew trust oven-sh/bun
 brew update
 brew upgrade --yes
 brew bundle --file="${_target_brewfile}"
