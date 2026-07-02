@@ -45,7 +45,6 @@ from deploy_dotfiles import (
     SPECIAL_HANDLERS,
     SYMLINK_WHOLE_DIRS,
     deploy_repos_with_priority,
-    deploy_repos_with_priority,
     make_backup,
     repo_name_to_target_name,
     resolve_target_path,
@@ -597,13 +596,16 @@ class TestGitconfigHandler(unittest.TestCase):
 
     def test_gitconfig_existing_symlink_left_in_place(self):
         """An existing symlink to the dotfiles gitconfig is accepted, not replaced."""
+        if not _can_symlink():
+            self.skipTest("Symlinks not available on this platform")
         repo = make_test_repo(self.tmp, "repo", {"_dot_gitconfig": "[user]\n  name = Test\n"})
         src = repo / "settings" / "_dot_gitconfig"
         gitconfig = self.home / ".gitconfig"
         gitconfig.symlink_to(src)
+        self.assertTrue(gitconfig.is_symlink())
         deploy_repos_with_priority(_make_ctx(self.home), [repo])
         self.assertTrue(gitconfig.is_symlink())
-        self.assertEqual(Path(os.readlink(gitconfig)).resolve(), src.resolve())
+        self.assertEqual(Path(_readlink(gitconfig)).resolve(), src.resolve())
 
 
 # ---------------------------------------------------------------------------

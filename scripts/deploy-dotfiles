@@ -199,7 +199,7 @@ def _check_gitconfig_include(ctx: "DeployContext", src: Path, dst: Path) -> Hand
         return HandlerResult(True, f"create {dst} with [include] path={src}")
     # dst is currently a symlink: a symlink to the dotfiles gitconfig is an
     # acceptable alternative to the [include] directive, so leave it in place.
-    if Path(os.readlink(dst)).resolve() == src.resolve():
+    if dst.resolve() == src.resolve():
         return HandlerResult(False, f".gitconfig already symlinked to {src}")
     return HandlerResult(True, f"replace symlink {dst} with real .gitconfig including {src}")
 
