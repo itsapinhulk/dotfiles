@@ -144,6 +144,10 @@ RUN nvim --headless -c "lua vim.defer_fn(function() vim.cmd('qa!') end, 60000)" 
 # ── install claude code ───────────────────────────────────────────────────────
 RUN curl -fsSL https://claude.ai/install.sh | bash
 
+
+# ── install rust ───────────────────────────────────────────────────────
+RUN curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain none
+
 # ── switch default shell to brew bash ─────────────────────────────────────────
 RUN echo "${BREW_BASH}" | sudo tee -a /etc/shells \
     && sudo chsh -s "${BREW_BASH}" ${USERNAME}
