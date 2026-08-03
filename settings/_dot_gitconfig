@@ -1,5 +1,10 @@
 [alias]
-    tree = log --graph --pretty=tformat:'%C(yellow)%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(blue)<%an>%Creset' --abbrev-commit --date=short --branches --all -20
+    # 20-commit graph over branches/remotes/HEAD, then any of HEAD's last 5 commits that
+    # the cap left out, listed as disconnected "~" lines. Walking to them in the graph would
+    # pull in every commit topologically above them -- hundreds, on a long-diverged fork.
+    # Refs are listed explicitly rather than using --all: jj creates a refs/jj/keep/* ref per
+    # commit, which --all would draw.
+    tree = "!f() { n=20; s=$(git rev-list --topo-order --branches --remotes HEAD -n $n \"$@\"); git log --graph --topo-order --pretty=tformat:'%C(yellow)%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(blue)<%an>%Creset' --abbrev-commit --date=short --branches --remotes HEAD -n $n \"$@\"; m=; for c in $(git rev-list -5 HEAD); do case \"$s\" in *$c*) ;; *) m=\"$m $c\";; esac; done; if [ -n \"$m\" ]; then git log --no-walk=unsorted --pretty=tformat:'%C(red)~%Creset %C(yellow)%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(blue)<%an>%Creset' --abbrev-commit --date=short $m; fi; }; f"
     twig = log --graph --pretty=tformat:'%C(yellow)%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(blue)<%an>%Creset' --abbrev-commit --date=short -20
     subupdate = submodule update --init --recursive --force
     subsync = submodule sync --recursive
