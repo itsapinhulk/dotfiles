@@ -255,6 +255,7 @@ _LABEL_WIDTH = 16
 SYMLINK_WHOLE_DIRS: set[str] = {
     ".config/nvim/lua",
     ".config/tmuxp",
+    ".ipython/profile_default/startup",
 }
 
 
