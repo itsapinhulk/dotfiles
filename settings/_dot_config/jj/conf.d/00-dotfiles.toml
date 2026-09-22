@@ -27,6 +27,8 @@ alog = ["log", "-r", "all()"]
 # Show summary of commit without all the changes
 view = ["show", "--no-patch"]
 
+fork = ["util", "exec", "--", "bash", "-c", 'jj log -r "fork($1, $2)" "${@:3}"', ""]
+
 [template-aliases]
 # Relative timestamp rendered as "x days/hours/seconds ago"
 'format_timestamp(timestamp)' = 'timestamp.ago()'
@@ -121,6 +123,9 @@ builtin_immutable_heads() | (trunk()..remote_bookmarks()) | (trunk().. & ~mine()
 
 # All of my_heads() with some context
 "my_heads_log()" = "_add_log_context(my_heads())"
+
+# Show divering history of two bookmarks/revsets
+'fork(x, y)' = 'fork_point(x | y)::(x | y)'
 
 [revsets]
 log='default_log()'
