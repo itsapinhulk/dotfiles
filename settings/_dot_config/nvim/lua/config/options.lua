@@ -68,3 +68,6 @@ vim.o.linebreak = true
 -- lsp settings
 vim.g.lazyvim_python_lsp = "basedpyright"  -- default is "pyright"
 vim.g.lazyvim_python_ruff = "ruff"         -- "ruff_lsp" is the deprecated old server
+
+-- Hide diagnostics by default, toggle with <leader>ud
+vim.diagnostic.enable(false)
