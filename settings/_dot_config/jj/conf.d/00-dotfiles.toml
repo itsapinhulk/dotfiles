@@ -6,6 +6,7 @@ diff-formatter = ":git"
 default-command = ["log"]
 diff-editor = ":builtin"
 # diff-editor = ["nvim", "-c", "DiffEditor $left $right $output"]
+conflict-marker-style = "git"
 
 [ui.movement]
 edit = true
